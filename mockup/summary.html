@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Sign Up Form</title>
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="css/wizard.css">
+  </head>
+
+  <body>
+
+    <div class="main">
+      
+      <div class="container">
+        <h2>Setup the Deme server</h2>
+
+
+        <form method="POST" id="signup-form" class="signup-form wizard clearfix" novalidate="novalidate" role="application">
+          <div class="steps clearfix">
+            <ul role="tablist">
+
+              <li role="tab" class="disabled" aria-disabled="false" aria-selected="true">
+                <a id="signup-form-t-0" aria-controls="signup-form-p-0">
+                  <span class="current-info audible">
+                  </span>
+                  <div class="title">
+                    <span class="number">1
+                    </span>
+                    <span class="title_text">General Information
+                    </span>
+                  </div>
+                </a>
+              </li>
+
+              <li role="tab" class="disabled" aria-disabled="true">
+                <a id="signup-form-t-1" aria-controls="signup-form-p-1">
+                  <div class="title">
+                    <span class="number">2
+                    </span>
+                    <span class="title_text">Deme Configurator
+                    </span>
+                  </div>
+                </a>
+              </li>
+
+              <li role="tab" class="current" aria-disabled="true">
+                <a id="signup-form-t-2" aria-controls="signup-form-p-2">
+                  <div class="title">
+                    <span class="number">3
+                    </span>
+                    <span class="title_text">Configuration Summary
+                    </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="content clearfix">
+
+
+            <fieldset id="signup-form-p-0" role="tabpanel" aria-labelledby="signup-form-h-0" class="body current" aria-hidden="false">
+
+
+
+              <div id="pbkeys">
+                <!-- This will be updated from javascript -->
+                <div class="form-group">
+                  <label class="form-label">Title</label>
+                  <div class="textarea">
+                    A local community
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label"><div style="">UUID</div></label>
+                <div class="textarea">
+                  916f7771-afe2-4319-943d-0e770c333432
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <label class="form-label"><div style="">Cryptographic Group</div></label>
+                <div class="textarea">
+                  Elliptic Curve P192
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label"><div style="">Hash Function</div></label>
+                <div class="textarea">
+                  SHA 256
+                </div>
+              </div>
+
+                            
+              <div class="form-group">
+                <label class="form-label">Guardian</label>
+                <div class="textarea">
+                  FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Authorized Roles</label>
+                <div class="textarea">
+                  <b>BraidChain</b>, <s>BallotBox</s>, <b>Registrar</b>, <s>Proposer</s>, <s>Braider</s>
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <label class="form-label">Current Commit</label>
+                <div class="textarea">
+                  #1
+                </div>
+              </div>
+
+            </fieldset>
+            </div>
+        </form>
+
+
+
+        <div class="fieldset-footer">
+          <div class="actions clearfix">
+            <span>Signed by Guardian on Jan 1st 2024 at 22:34
+            </span>
+            <ul role="menu" aria-label="Pagination">
+              <li aria-disabled="true">
+                <a href="configurator.html" role="menuitem">Previous
+                </a>
+              </li>
+              <li style="display: none;" id="submitBtn" aria-hidden="false" aria-disabled="false">
+                <a href="" role="menuitem" onclick="">Next
+                </a>
+              </li>
+              <li style="" aria-hidden="true">
+                <a href="status.html" role="menuitem">Commit
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        </div>
+        </div>
+
+        <!-- <script src="js/advanced-configurator.js"></script> -->
+  </body>
+
+</html>

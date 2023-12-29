@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Sign Up Form</title>
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="css/wizard.css">
+  </head>
+
+  <body>
+
+    <div class="main">
+      
+      <div class="container">
+        <h2>Setup the Deme server</h2>
+
+
+        <form method="POST" id="signup-form" class="signup-form wizard clearfix" novalidate="novalidate" role="application">
+          <div class="steps clearfix">
+            <ul role="tablist">
+
+              <li role="tab" class="disabled" aria-disabled="false" aria-selected="true">
+                <a id="signup-form-t-0" aria-controls="signup-form-p-0">
+                  <span class="current-info audible">
+                  </span>
+                  <div class="title">
+                    <span class="number">1
+                    </span>
+                    <span class="title_text">General Information
+                    </span>
+                  </div>
+                </a>
+              </li>
+
+              <li role="tab" class="current" aria-disabled="true">
+                <a id="signup-form-t-1" aria-controls="signup-form-p-1">
+                  <div class="title">
+                    <span class="number">2
+                    </span>
+                    <span class="title_text">Deme Configurator
+                    </span>
+                  </div>
+                </a>
+              </li>
+
+              <li role="tab" class="disabled" aria-disabled="true">
+                <a id="signup-form-t-2" aria-controls="signup-form-p-2">
+                  <div class="title">
+                    <span class="number">3
+                    </span>
+                    <span class="title_text">Configuration Summary
+                    </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="content clearfix">
+
+
+            <fieldset id="signup-form-p-0" role="tabpanel" aria-labelledby="signup-form-h-0" class="body current" aria-hidden="false">
+              <div class="form-group">
+                <label for="username" class="form-label">Deme Title
+                </label>
+                <input type="text" name="username" id="username" placeholder="Deme Title">
+              </div>
+
+              <div class="form-group">
+                <label for="username" class="form-label">Guardian Email
+                </label>
+                <input type="text" name="username" id="username" placeholder="Guardian Email">
+              </div>
+
+              <div class="form-select">
+                <label for="country" class="form-label">Cryptographic Group
+                </label>
+                <select name="country" id="country">
+                  <option value="EC-P192" selected>Elliptic Curve P192
+                  </option>
+                  <option value="EC-P256">Elliptic Curve P256
+                  </option>
+                  <option value="MODP-2048">Modular Prime 2048
+                  </option>
+                  <option value="MODP-4012">Modular Prime 4012
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-select">
+                <label for="country" class="form-label">Hash Function
+                </label>
+                <select name="country" id="country">
+                  <option value="SHA-128">SHA-128
+                  </option>
+                  <option value="SHA-256" selected>SHA-256
+                  </option>
+                  <option value="SHA-512">SHA-512
+                  </option>
+                </select>
+              </div>
+              
+              <div class="form-group form-password">
+                <label for="password" class="form-label">Guardian Password
+                </label>
+                <input type="password" name="password" id="password" onkeyup="checkPasswordStrength()">
+                  <div id="pwindicator" class="pw-very-weak"> 
+                    <div class="label"></div>
+                  </div>
+                </div>
+
+
+                <div class="form-group form-password">
+                  <label for="password" class="form-label">Repeat Password
+                  </label>
+                  <input type="password" name="password" id="password2" autocomplete="off" data-indicator="pwindicator2" onkeyup="checkPasswordEquality()">
+                  <div id="pwindicator2">
+                    <div class="label">
+                    </div>
+                  </div>
+                </div>
+
+
+                  <!-- <div class="fieldset-footer"> -->
+                  <!--   <span>Click here for advanced configuration -->
+                  <!--     </span> -->
+                  <!-- </div> -->
+            </fieldset>
+            </div>
+              
+              <!-- <div class="actions clearfix"> -->
+              <!--   <ul role="menu" aria-label="Pagination"> -->
+              <!--     <li aria-disabled="true"> -->
+              <!--       <a href="#previous" role="menuitem">Back -->
+              <!--       </a> -->
+              <!--     </li> -->
+              <!--     <li id="submitBtn" aria-hidden="false" aria-disabled="false"> -->
+              <!--       <a href="#next" role="menuitem" onclick="submitForm()">Next -->
+              <!--       </a> -->
+              <!--     </li> -->
+              <!--     <li style="display: none;" aria-hidden="true"> -->
+              <!--       <a href="#finish" role="menuitem">Submit -->
+              <!--       </a> -->
+              <!--     </li> -->
+              <!--   </ul> -->
+              <!-- </div> -->
+        </form>
+
+
+        <div class="fieldset-footer">
+          <div class="actions clearfix">
+            <span><a href="advanced-configurator.html">Click here for advanced configuration</a>
+            </span>
+            <ul role="menu" aria-label="Pagination">
+              <li class="" aria-disabled="true">
+                <a href="info.html" role="menuitem">Previous
+                </a>
+              </li>
+              <li id="submitBtn" aria-hidden="false" aria-disabled="false">
+                <a href="#next" role="menuitem" onclick="submitForm()">Next
+                </a>
+              </li>
+              <li style="display: none;" aria-hidden="true">
+                <a href="#finish" role="menuitem">Submit
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        </div>
+
+        </div>
+
+        <script src="js/wizard-configurator.js"></script>
+  </body>
+
+</html>

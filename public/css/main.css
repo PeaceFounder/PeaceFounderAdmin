@@ -1,0 +1,25 @@
+.table-hover tbody tr:active {
+  background-color: #212936; /* Light blue color */
+}
+
+.table-hover tbody tr:active td {
+  color: white;
+}
+
+.table-hover tbody tr:active td a {
+  color: white;
+}
+
+
+.table-hover tbody tr.selected {
+  background-color: #212936; /* Light blue color */
+}
+
+.table-hover tbody tr.selected td {
+  color: white;
+}
+
+.table-hover tbody tr.selected td a {
+  color: white;
+}
+

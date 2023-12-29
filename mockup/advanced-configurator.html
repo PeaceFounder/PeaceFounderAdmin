@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Sign Up Form</title>
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="css/wizard.css">
+  </head>
+
+  <body>
+
+    <div class="main">
+      
+      <div class="container">
+        <h2>Setup the Deme server</h2>
+
+
+        <form method="POST" id="signup-form" class="signup-form wizard clearfix" novalidate="novalidate" role="application">
+          <div class="steps clearfix">
+            <ul role="tablist">
+
+              <li role="tab" class="disabled" aria-disabled="false" aria-selected="true">
+                <a id="signup-form-t-0" aria-controls="signup-form-p-0">
+                  <span class="current-info audible">
+                  </span>
+                  <div class="title">
+                    <span class="number">1
+                    </span>
+                    <span class="title_text">General Information
+                    </span>
+                  </div>
+                </a>
+              </li>
+
+              <li role="tab" class="current" aria-disabled="true">
+                <a id="signup-form-t-1" aria-controls="signup-form-p-1">
+                  <div class="title">
+                    <span class="number">2
+                    </span>
+                    <span class="title_text">Advanced Deme Configurator
+                    </span>
+                  </div>
+                </a>
+              </li>
+
+              <li role="tab" class="disabled" aria-disabled="true">
+                <a id="signup-form-t-2" aria-controls="signup-form-p-2">
+                  <div class="title">
+                    <span class="number">3
+                    </span>
+                    <span class="title_text">Configuration Summary
+                    </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="content clearfix">
+
+
+            <fieldset id="signup-form-p-0" role="tabpanel" aria-labelledby="signup-form-h-0" class="body current" aria-hidden="false">
+
+
+
+
+              <!-- <div class="form-select"> -->
+              <!--   <label for="country" class="form-label">Cryptographic Group -->
+              <!--   </label> -->
+              <!--   <select name="country" id="country"> -->
+              <!--     <option value="EC-P192" selected>Elliptic Curve P192 -->
+              <!--     </option> -->
+              <!--     <option value="EC-P256">Elliptic Curve P256 -->
+              <!--     </option> -->
+              <!--     <option value="MODP-2048">Modular Prime 2048 -->
+              <!--     </option> -->
+              <!--     <option value="MODP-4012">Modular Prime 4012 -->
+              <!--     </option> -->
+              <!--   </select> -->
+              <!--   <span id="button" onclick="document.getElementById('filePicker').click();">Select File -->
+              <!--   </span> -->
+              <!--   <span id="button" onclick="document.getElementById('filePicker').click();">Select File -->
+              <!--   </span> -->
+              <!-- </div> -->
+
+              <div class="form-group">
+                <label for="your_avatar" class="form-label">Cryptographic Group
+                </label>
+                <div class="form-file">
+                  <select name="country" id="country">
+                    <option value="EC-P192" selected>Elliptic Curve P192
+                    </option>
+                    <option value="EC-P256">Elliptic Curve P256
+                    </option>
+                    <option value="MODP-2048">Modular Prime 2048
+                    </option>
+                    <option value="MODP-4012">Modular Prime 4012
+                    </option>
+                  </select>
+                  <span id="button" onclick="">Add
+                  </span>
+                </div>
+                <span id="button" onclick="">Reset
+                </span>
+              </div>
+
+              <div id="pbkeys">
+                <!-- This will be updated from javascript -->
+                <div class="form-group">
+                  <label class="form-label">Public Key #1</label>
+                  <div class="textarea">
+                    FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2
+                  </div>
+                </div>
+              </div>
+
+              <div id="pbkeys">
+                <!-- This will be updated from javascript -->
+                <div class="form-group">
+                  <label class="form-label">Public Key #1</label>
+                  <div class="textarea">
+                    FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2
+                  </div>
+                </div>
+              </div>
+
+
+              <div id="pbkeys">
+                <!-- This will be updated from javascript -->
+                <div class="form-group">
+                  <label class="form-label">Public Key #1</label>
+                  <div class="textarea">
+                    FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2
+                  </div>
+                </div>
+              </div>
+
+
+
+                  <div class="form-group">
+                    <label for="your_avatar" class="form-label">Deme Record
+                    </label>
+                    <div class="form-file">
+                      <input type="file" name="your_file" id="demePicker" onchange="showFileNameDeme()" class="custom-file-input">
+                      <span id="val">
+                        <div id="deme"></div>
+                      </span>
+                      <span id="button" onclick="document.getElementById('demePicker').click();">Select File
+                      </span>
+                    </div>
+                  </div>
+
+
+                  <div class="form-group">
+                    <label for="your_avatar" class="form-label">Restore Ledger
+                    </label>
+                    <div class="form-file">
+                      <input type="file" name="your_file" id="ledgerPicker" onchange="showFileNameLedger()" class="custom-file-input">
+                      <span id="val">
+                        <div id="ledger"></div>
+                      </span>
+                      <span id="button" onclick="document.getElementById('ledgerPicker').click();">Select File
+                      </span>
+                    </div>
+                  </div>
+
+
+
+            </fieldset>
+            </div>
+
+
+            
+        </form>
+
+        <div class="fieldset-footer">
+          <div class="actions clearfix">
+            <span><a href="configurator.html">Return to basic configurator</a>
+            </span>
+            <ul role="menu" aria-label="Pagination">
+              <li class="" aria-disabled="true">
+                <a href="info.html" role="menuitem">Previous
+                </a>
+              </li>
+              <li id="submitBtn" aria-hidden="false" aria-disabled="false">
+                <a href="#next" role="menuitem" onclick="submitForm()">Next
+                </a>
+              </li>
+              <li style="display: none;" aria-hidden="true">
+                <a href="#finish" role="menuitem">Submit
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+
+
+
+        </div>
+        </div>
+
+        <script src="js/wizard-advanced-configurator.js"></script>
+  </body>
+
+</html>
