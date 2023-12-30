@@ -65,8 +65,37 @@ function checkPasswordEquality() {
 }
 
 
-function submitForm() {
+function form2json(formId) {
 
+    var form = document.getElementById(formId);
+    var formData = new FormData(form);
+
+    var object = {};
+    formData.forEach(function(value, key){
+        object[key] = value;
+    });
+
+    var json = JSON.stringify(object);
+
+    return json;
+}
+
+
+function postData(url, json) {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: json
+    });
+        //.then(response => response.json());
+}
+
+
+async function submitForm() {
+
+    //var form = document.getElementById("configuration");
 
     let hasError = !checkPasswordStrength() || !checkPasswordEquality()
 
@@ -81,8 +110,18 @@ function submitForm() {
         });
     } else {
 
-        window.location.assign("summary.html");
-
+        json = form2json("configuration");
+        
+        const response = await postData('configurator', json)
+            
+        if (response.ok) {
+            window.location.assign("setup-summary");            
+        } else {
+            console.log(`Error: HTTP error! Status: ${response.status}`)
+        };
+            
+        // postData('configurator', json)
+        //     .then(data => console.log(data))
+        //     .catch(error => console.error('Error:', error));
     }
-    
 }

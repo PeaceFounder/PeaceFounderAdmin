@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Sign Up Form</title>
+    <title>Deme Server Setuo</title>
 
     <!-- Font Icon -->
     <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
@@ -20,11 +20,11 @@
         <h2>Setup the Deme server</h2>
 
 
-        <form method="POST" id="signup-form" class="signup-form wizard clearfix" novalidate="novalidate" role="application">
+        <form method="POST" action="/configurator" id="configuration" class="signup-form wizard clearfix" novalidate="novalidate" role="application">
           <div class="steps clearfix">
             <ul role="tablist">
 
-              <li role="tab" class="current" aria-disabled="false" aria-selected="true">
+              <li role="tab" class="disabled" aria-disabled="false" aria-selected="true">
                 <a id="signup-form-t-0" aria-controls="signup-form-p-0">
                   <span class="current-info audible">
                   </span>
@@ -37,7 +37,7 @@
                 </a>
               </li>
 
-              <li role="tab" class="disabled" aria-disabled="true">
+              <li role="tab" class="current" aria-disabled="true">
                 <a id="signup-form-t-1" aria-controls="signup-form-p-1">
                   <div class="title">
                     <span class="number">2
@@ -63,38 +63,72 @@
 
           <div class="content clearfix">
 
-
             <fieldset id="signup-form-p-0" role="tabpanel" aria-labelledby="signup-form-h-0" class="body current" aria-hidden="false">
-
-
-
-              <div id="pbkeys">
-                <!-- This will be updated from javascript -->
-                <div class="form-group">
-                  <label class="form-label">Note</label>
-                  <div class="textarea" style="margin-right: 50px;">
-                    This is a PeaceFounder evoting system alpha preview. It is intended as demonstration that for showing how all the best inventeed cryptography today can come together to provide publically verifiable ellections and strong privacy guarantees with reasonable user experience.
-                  </div>
-                </div>
+              <div class="form-group">
+                <label for="username" class="form-label">Deme Title
+                </label>
+                <input type="text" name="title" placeholder="Deme Title" required>
               </div>
 
+              <div class="form-group">
+                <label for="username" class="form-label">Guardian Email
+                </label>
+                <input type="text" name="email" placeholder="Guardian Email" required>
+              </div>
+
+              <div class="form-select">
+                <label class="form-label">Cryptographic Group
+                </label>
+                <select name="group">
+                  {{>group_specs.html}}
+                </select>
+              </div>
+
+              <div class="form-select">
+                <label class="form-label">Hash Function
+                </label>
+                <select name="hash">
+                  {{>hash_specs.html}}
+                </select>
+              </div>
+              
+              <div class="form-group form-password">
+                <label for="password" class="form-label">Guardian Password
+                </label>
+                <input type="password" name="password" id="password" onkeyup="checkPasswordStrength()">
+                  <div id="pwindicator" class="pw-very-weak"> 
+                    <div class="label"></div>
+                  </div>
+                </div>
+
+
+                <div class="form-group form-password">
+                  <label for="password" class="form-label">Repeat Password
+                  </label>
+                  <input type="password" id="password2" autocomplete="off" data-indicator="pwindicator2" onkeyup="checkPasswordEquality()">
+                  <div id="pwindicator2">
+                    <div class="label">
+                    </div>
+                  </div>
+                </div>
 
             </fieldset>
             </div>
+
         </form>
 
 
         <div class="fieldset-footer">
           <div class="actions clearfix">
-            <span><a href="advanced-configurator.html">Click here for advanaced configuration</a>
+            <span><a href="advanced-configurator">Click here for advanced configuration</a>
             </span>
             <ul role="menu" aria-label="Pagination">
-              <li style="display: none;" aria-disabled="true">
-                <a href="#previous" role="menuitem">Previous
+              <li class="" aria-disabled="true">
+                <a href="/" role="menuitem">Previous
                 </a>
               </li>
               <li id="submitBtn" aria-hidden="false" aria-disabled="false">
-                <a href="configurator.html" role="menuitem" onclick="submitForm()">Next
+                <a href="#next" role="menuitem" onclick="submitForm()">Next
                 </a>
               </li>
               <li style="display: none;" aria-hidden="true">
@@ -106,9 +140,10 @@
         </div>
 
         </div>
+
         </div>
 
-        <!-- <script src="js/advanced-configurator.js"></script> -->
+        <script src="js/wizard-configurator.js"></script>
   </body>
 
 </html>

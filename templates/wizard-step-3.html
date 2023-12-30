@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Sign Up Form</title>
+    <title>Deme Server Setuo</title>
 
     <!-- Font Icon -->
     <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
@@ -24,7 +24,7 @@
           <div class="steps clearfix">
             <ul role="tablist">
 
-              <li role="tab" class="current" aria-disabled="false" aria-selected="true">
+              <li role="tab" class="disabled" aria-disabled="false" aria-selected="true">
                 <a id="signup-form-t-0" aria-controls="signup-form-p-0">
                   <span class="current-info audible">
                   </span>
@@ -48,7 +48,7 @@
                 </a>
               </li>
 
-              <li role="tab" class="disabled" aria-disabled="true">
+              <li role="tab" class="current" aria-disabled="true">
                 <a id="signup-form-t-2" aria-controls="signup-form-p-2">
                   <div class="title">
                     <span class="number">3
@@ -71,13 +71,57 @@
               <div id="pbkeys">
                 <!-- This will be updated from javascript -->
                 <div class="form-group">
-                  <label class="form-label">Note</label>
-                  <div class="textarea" style="margin-right: 50px;">
-                    This is a PeaceFounder evoting system alpha preview. It is intended as demonstration that for showing how all the best inventeed cryptography today can come together to provide publically verifiable ellections and strong privacy guarantees with reasonable user experience.
+                  <label class="form-label">Title</label>
+                  <div class="textarea">
+                    {{:title}}
                   </div>
                 </div>
               </div>
 
+              <div class="form-group">
+                <label class="form-label"><div style="">UUID</div></label>
+                <div class="textarea">
+                  {{:uuid}}
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <label class="form-label"><div style="">Cryptographic Group</div></label>
+                <div class="textarea">
+                  {{:group_name}}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label"><div style="">Hash Function</div></label>
+                <div class="textarea">
+                  {{:hash_name}}
+                </div>
+              </div>
+
+                            
+              <div class="form-group">
+                <label class="form-label">Guardian</label>
+                <div class="textarea">
+                  {{:guardian_pbkey}}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Authorized Roles</label>
+                <div class="textarea">
+                  {{{:roles}}}
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <label class="form-label">Current Commit</label>
+                <div class="textarea">
+                  {{:commit}}
+                </div>
+              </div>
 
             </fieldset>
             </div>
@@ -86,20 +130,20 @@
 
         <div class="fieldset-footer">
           <div class="actions clearfix">
-            <span><a href="advanced-configurator.html">Click here for advanaced configuration</a>
+            <span>Signed by Guardian on Jan 1st 2024 at 22:34
             </span>
             <ul role="menu" aria-label="Pagination">
-              <li style="display: none;" aria-disabled="true">
-                <a href="#previous" role="menuitem">Previous
+              <li aria-disabled="true">
+                <a href="configurator.html" role="menuitem">Previous
                 </a>
               </li>
-              <li id="submitBtn" aria-hidden="false" aria-disabled="false">
-                <a href="configurator.html" role="menuitem" onclick="submitForm()">Next
+              <li style="display: none;" id="submitBtn" aria-hidden="false" aria-disabled="false">
+                <a href="" role="menuitem" onclick="">Next
                 </a>
               </li>
-              <li style="display: none;" aria-hidden="true">
-                <a href="#finish" role="menuitem">Submit
-                </a>
+              <li style="" aria-hidden="true">
+                <form id="commit" method="POST" action="/setup-summary"></form>
+                <a href="#" onclick="document.getElementById('commit').submit();" role="menuitem">Commit</a>
               </li>
             </ul>
           </div>
