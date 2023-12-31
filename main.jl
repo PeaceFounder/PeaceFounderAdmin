@@ -128,8 +128,8 @@ end
     # Title first
     tmpl = Mustache.load(joinpath(TEMPLATES, "wizard-step-3.html"))
 
-    group_name = get_option_text(joinpath(TEMPLATES, "group_specs.html"), PeaceFounder.Model.lower_groupspec(crypto.group))
-    hash_name = get_option_text(joinpath(TEMPLATES, "hash_specs.html"), string(crypto.hasher))
+    group_name = get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(crypto.group))
+    hash_name = get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(crypto.hasher))
     
     guardian_pbkey = chunk_string(string(guardian), 8) |> uppercase
 
@@ -174,6 +174,46 @@ end
 
     return render(joinpath(TEMPLATES, "status.html")) |> html
 end
+
+
+
+# For testing purposes
+function init_state()
+
+    title = "Some Community"
+    hash = "sha256"
+    group = "EC: P_192"
+
+    crypto = CryptoSpec(hash, group)
+
+    guardian = generate(Signer, crypto)
+    proposer = generate(Signer, crypto)
+    
+    Mapper.initialize!(crypto)
+
+    roles = Mapper.system_roles()
+    
+    spec = DemeSpec(;
+                    uuid = UUIDs.uuid4(),
+                    title = title,
+                    crypto = crypto,
+                    guardian = id(guardian),
+                    recorder = roles.recorder,
+                    recruiter = roles.recruiter,
+                    braider = roles.braider,
+                    proposer = id(proposer),
+                    collector = roles.collector
+                    ) |> approve(guardian)
+    
+
+    Mapper.capture!(spec)
+
+    return    
+end
+
+
+init_state()
+
 
 
 Oxygen.serve(port=3221)
