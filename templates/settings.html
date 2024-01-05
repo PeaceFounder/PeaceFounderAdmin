@@ -19,18 +19,19 @@
 <html lang="en">
 
   <head> 
-    <title>Volt Free Bootstrap Dashboard - Settings</title>
-    <meta name="title" content="Volt Free Bootstrap Dashboard - Settings">
+    <title>PeaceFounder - Settings</title>
+    <meta name="title" content="PeaceFounder - Settings">
     {{>partials/head.html}}
   </head>
   
   <body>
+    {{>partials/nav.html}}
     {{>partials/sidenav.html}}
     
     <main class="content" style="max-width: 1024px;">
 
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-
+        
         <div class="d-block mb-4 mb-md-0">
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
@@ -51,94 +52,97 @@
         </div>
 
         <div class="btn-toolbar mb-2 mb-md-0">
-          <a href="" class="btn btn-sm btn-primary d-inline-flex align-items-center ms-2">
+          <a href="#" class="btn btn-sm btn-primary d-inline-flex align-items-center ms-2" onclick="submitFormsReload(['smtpForm', 'inviteForm']);">  
             Update Configuration
           </a>
         </div>
 
       </div>
 
-      <div class="row">
 
+      <div class="row">
 
         <div class="col-12">
           <div class="card card-body border-0 shadow mb-4">
 
             <div class="d-flex justify-content-between">
               <h2 class="h5 mb-4">SMTP</h2>
-
               <div class="col-md-5">
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="someone@somehere.org">
-                  <a href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
-                    Test
-                  </a>
+                <form method="POST" action="/settings/smtp-test" id="smtp-test">
+                  <div class="input-group">
+                    <input type="text" name="email" class="form-control" placeholder="someone@somehere.org">
+                    <a href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center" onclick="submitForm('smtp-test');">
+                      Test
+                    </a>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+
+            <form method="POST" action="/settings/smtp" id="smtpForm">
+
+              <div class="row">
+                
+                
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">Email</label>
+                  <input class="form-control" name="email" type="text" placeholder="someone@somewhere.com" value="{{SMTP_EMAIL}}" required>
                 </div>
-              </div>
-            </div>
 
 
-            <div class="row">
+                <div class="col-md-6 mb-3">
 
-              <div class="col-md-6 mb-3">
-                <label for="first_name">Email</label>
-                <input class="form-control" type="text" placeholder="someone@somewhere.com" data-original-value="someone@somewhere.org" value="someone@somewhere.org" required>
-              </div>
+                  <label for="first_name">Password</label>
+                  <input class="form-control" name="password" type="password" placeholder="••••••" value="{{SMTP_PASSWORD}}">  
+                </div>
 
+                <div class="col-md-6 mb-3">
 
-              <div class="col-md-6 mb-3">
-
-                <label for="first_name">Password</label>
-                <input class="form-control" id="first_name" type="password" placeholder="" required>  
-              </div>
-
-              <div class="col-md-6 mb-3">
-
-                <label for="first_name">Server Address</label>
-                <input class="form-control" data-original-value="smtps://mail.inbox.lv:465" value="smtps://mail.inbox.lv:465" type="text" placeholder="smtps://mail.inbox.lv:465" required>  
-              </div>
+                  <label for="first_name">Server Address</label>
+                  <input class="form-control" name="server" value="{{SMTP_SERVER}}" type="text" placeholder="smtps://mail.inbox.lv:465" required>  
+                </div>
 
 
+              </div>              
 
-              <div class="col-md-12 mb-3 mt-3">
-
-
-              </div>
-
-            </div>              
+            </form>
+            
 
 
-            <h2 class="h5 mb-4">Invite</h2>
+            <h2 class="h5 mb-4 mt-4">Invite</h2>
+
+            <form method="POST" action="/settings/invite" id="inviteForm">
+
+              <div class="row">
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">Deme Address</label>
+                  <input class="form-control" name="address" type="text" placeholder="192.168.1.1:2030" value="{{INVITE_ADDRESS}}">
+                </div>
+
+                <div id="under-construction" class="col-md-6 mb-3">
+                  <label for="first_name">Time Limit</label>
+                  <input class="form-control" name="time" type="text" placeholder="3600 seconds">
+                </div>
 
 
-            <div class="row">
-
-              <div class="col-md-6 mb-3">
-                <label for="first_name">Deme Address</label>
-                <input class="form-control" id="first_name" type="text" placeholder="192.168.1.1:2030" data-value="192.168.1.1:2030" value="192.168.1.1:2030">
-              </div>
-
-              <div id="under-construction" class="col-md-6 mb-3">
-                <label for="first_name">Time Limit</label>
-                <input class="form-control" id="first_name" type="text" placeholder="3600 seconds">
-              </div>
+                <div class="col-md-12 mb-3">
+                  <label for="first_name">Invite Subject</label>
+                  <input class="form-control" name="subject" type="text" value="{{INVITE_SUBJECT}}"> 
+                </div>
 
 
-              <div class="col-md-12 mb-3">
-                <label for="first_name">Invite Subject</label>
-                <input class="form-control" id="first_name" type="text" placeholder="Invite to a great community">
+                <div class="col-md-12 mb-3">
+                  <label for="first_name">Invite Text</label>
+                  <textarea class="form-control" name="text" id="exampleFormControlTextarea1" rows="15">{{INVITE_TEXT}}</textarea>
+                  <small id="emailHelp" class="form-text text-muted">Use Invite variable to place it in desired place</small>
+                </div>
+
               </div>
 
-
-              <div class="col-md-12 mb-3">
-                <label for="first_name">Invite Text</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="7"></textarea>
-                <small id="emailHelp" class="form-text text-muted">Use Invite variable to place it in desired place</small>
-              </div>
-
-            </div>
-
-
+            </form>
           </div>
 
 
@@ -200,7 +204,7 @@
                     </td>
                     <td>
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                        <input class="form-check-input track-change" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
                       </div>  
                     </td>
                   </tr>
@@ -230,250 +234,250 @@
 
                     <td>
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                        <input class="form-check-input track-change" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
                       </div>  
                     </td>
 
                   </tr>
 
 
-<!-- Item -->
-<tr>
-  <td style="padding-top:5px; padding-bottom:0px;">
-    <span class="fw-normal">The Other Community
-      <div style="font-size: 10px;">31a120cc-b3cb-4d07-bbdb-d498660ddfd8
-      </div>
-    </span>
-  </td>
+                  <!-- Item -->
+                  <tr>
+                    <td style="padding-top:5px; padding-bottom:0px;">
+                      <span class="fw-normal">The Other Community
+                        <div style="font-size: 10px;">31a120cc-b3cb-4d07-bbdb-d498660ddfd8
+                        </div>
+                      </span>
+                    </td>
 
-  <td>
-    cv8mfr31NL0TCDj
-  </td>
-  <td>
-    <div class="d-flex justify-content-between">
-      <div>0.35
-      </div>
-      <div>0.45
-      </div>
-      <div>0.70
-      </div>
-    </div>
-  </td>
+                    <td>
+                      cv8mfr31NL0TCDj
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-between">
+                        <div>0.35
+                        </div>
+                        <div>0.45
+                        </div>
+                        <div>0.70
+                        </div>
+                      </div>
+                    </td>
 
-  <td>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
-    </div>  
-  </td>
-</tr>
+                    <td>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                      </div>  
+                    </td>
+                  </tr>
 
-<!-- Item -->
-<tr>
-  <td style="padding-top:5px; padding-bottom:0px;">
-    <span class="fw-normal">Local Democratic Community
-      <div style="font-size: 10px;">31a120cc-b3cb-4d07-bbdb-d498660ddfd8
-      </div>
-    </span>
-  </td>                      
+                  <!-- Item -->
+                  <tr>
+                    <td style="padding-top:5px; padding-bottom:0px;">
+                      <span class="fw-normal">Local Democratic Community
+                        <div style="font-size: 10px;">31a120cc-b3cb-4d07-bbdb-d498660ddfd8
+                        </div>
+                      </span>
+                    </td>                      
 
-  <td>
-    TOTAL INPUT/TOTAL OUTPUT
-  </td>
-  <td>
-    <div class="d-flex justify-content-between">
-      <div>0.35
-      </div>
-      <div>0.45
-      </div>
-      <div>0.70
-      </div>
-    </div>
-  </td>
-  
-  <td>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
-    </div>  
-  </td>
-</tr>
-
-
-<tr>
-  <td style="padding-top:5px; padding-bottom:0px;">
-    <span class="fw-normal">A Deme Allow List
-      <div style="font-size: 10px;">https://peacefounder.org/demelist
-      </div>
-    </span>
-  </td>
-
-  <td>
-
-  </td>
-  <td>
-    <div class="d-flex justify-content-between">
-      <div>0.35
-      </div>
-      <div>0.45
-      </div>
-      <div>0.70
-      </div>
-    </div>
-  </td>
-  
-  <td>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
-    </div>  
-  </td>
-</tr>
+                    <td>
+                      TOTAL INPUT/TOTAL OUTPUT
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-between">
+                        <div>0.35
+                        </div>
+                        <div>0.45
+                        </div>
+                        <div>0.70
+                        </div>
+                      </div>
+                    </td>
+                    
+                    <td>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                      </div>  
+                    </td>
+                  </tr>
 
 
-</tbody>
-</table>
+                  <tr>
+                    <td style="padding-top:5px; padding-bottom:0px;">
+                      <span class="fw-normal">A Deme Allow List
+                        <div style="font-size: 10px;">https://peacefounder.org/demelist
+                        </div>
+                      </span>
+                    </td>
 
-<div class="form-check form-switch mt-4">
-  <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" data-original-checked="true" checked="checked">
-  <label class="form-check-label" for="defaultCheck10">Enable open access of the braider, currently utilizing 0.35, 0.67, and 0.7 of the total compute power.
-  </label>
-</div>
+                    <td>
 
-</div>
-</div>
-
-
-<div id="under-construction" class="col-12">
-  <div class="card card-body border-0 shadow mb-4">
-    <h2 class="h5 mb-4">Braiding Scheduler</h2>
-    <div class="row">
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">Time Limit
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="180 seconds" required>
-      </div>
-
-
-      <div class="col-md-6 mb-3">
-
-        <label for="first_name">Scheduled Time
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="00:00 - 02:00" required>  
-      </div>
-
-      <div class="col-md-6 mb-3">
-
-        <label for="first_name">Minimum Gain
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="3" required>  
-      </div>
-
-      <div class="col-md-6 mb-3">
-
-        <label for="first_name">Optimal Anonimity Threshold
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="7" required>  
-      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-between">
+                        <div>0.35
+                        </div>
+                        <div>0.45
+                        </div>
+                        <div>0.70
+                        </div>
+                      </div>
+                    </td>
+                    
+                    <td>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                      </div>  
+                    </td>
+                  </tr>
 
 
-      <div class="col-md-12 mb-3 mt-3">
-        
+                </tbody>
+              </table>
 
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
-          <label class="form-check-label" for="defaultCheck10">Allow self-braiding to happen in situations where threshold limits are reached, even if at least a single member has not yet been braided.
-          </label>
+              <div class="form-check form-switch mt-4">
+                <input class="form-check-input track-change" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                <label class="form-check-label" for="defaultCheck10">Enable open access of the braider, currently utilizing 0.35, 0.67, and 0.7 of the total compute power.
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+
+          <div id="under-construction" class="col-12">
+            <div class="card card-body border-0 shadow mb-4">
+              <h2 class="h5 mb-4">Braiding Scheduler</h2>
+              <div class="row">
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">Time Limit
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="180 seconds" required>
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+
+                  <label for="first_name">Scheduled Time
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="00:00 - 02:00" required>  
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                  <label for="first_name">Minimum Gain
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="3" required>  
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                  <label for="first_name">Optimal Anonimity Threshold
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="7" required>  
+                </div>
+
+
+                <div class="col-md-12 mb-3 mt-3">
+                  
+
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked="checked">
+                    <label class="form-check-label" for="defaultCheck10">Allow self-braiding to happen in situations where threshold limits are reached, even if at least a single member has not yet been braided.
+                    </label>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+          <div id="under-construction" class="col-12">
+            <div class="card card-body border-0 shadow mb-4">
+              <h2 class="h5 mb-4">Braider Configuration</h2>
+
+              <div class="row">
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">Scheduled Time
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="00:00 - 05:00" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">Longest Braid
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="1000" required>  
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">System Max Load
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="3.7" required>  
+                </div>
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div id="under-construction" class="col-12">
+            <div class="card card-body border-0 shadow mb-4">
+              <h2 class="h5 mb-4">Buletin Board Access</h2>
+              
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">HTTP request threshold per 6 hours
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="10000" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">HTTP request rate limit per minute after threshold
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="5" required>
+                </div>
+
+              </div>
+
+
+              <div class="row">
+
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">RSync buletin board destination
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="user@someplace.org/BuletinBoard" required>
+                  <small id="emailHelp" class="form-text text-muted">SSH access must be passwordless
+                  </small>
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+                  <label for="first_name">Min Time Interval Threshold
+                  </label>
+                  <input class="form-control" id="first_name" type="text" placeholder="0" required>
+                  <small id="emailHelp" class="form-text text-muted">Waits to reduce load on server
+                  </small>
+                </div>
+                
+                <div class="col-md-12 mb-3 mt-3">
+                  For better access experience for auditors on limited devices we recommend setting up a Resilio Sync service which allows to share all buletin board records in a p2p network.
+                </div> 
+              </div>
+              
+            </div>
+          </div>
+
         </div>
       </div>
-
-    </div>
-
-  </div>
-</div>
-
-<div id="under-construction" class="col-12">
-  <div class="card card-body border-0 shadow mb-4">
-    <h2 class="h5 mb-4">Braider Configuration</h2>
-
-    <div class="row">
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">Scheduled Time
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="00:00 - 05:00" required>
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">Longest Braid
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="1000" required>  
-      </div>
-
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">System Max Load
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="3.7" required>  
-      </div>
-
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<div id="under-construction" class="col-12">
-  <div class="card card-body border-0 shadow mb-4">
-    <h2 class="h5 mb-4">Buletin Board Access</h2>
-    
-
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label for="first_name">HTTP request threshold per 6 hours
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="10000" required>
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">HTTP request rate limit per minute after threshold
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="5" required>
-      </div>
-
-    </div>
-
-
-    <div class="row">
-
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">RSync buletin board destination
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="user@someplace.org/BuletinBoard" required>
-        <small id="emailHelp" class="form-text text-muted">SSH access must be passwordless
-        </small>
-      </div>
-
-
-      <div class="col-md-6 mb-3">
-        <label for="first_name">Min Time Interval Threshold
-        </label>
-        <input class="form-control" id="first_name" type="text" placeholder="0" required>
-        <small id="emailHelp" class="form-text text-muted">Waits to reduce load on server
-        </small>
-      </div>
-      
-      <div class="col-md-12 mb-3 mt-3">
-        For better access experience for auditors on limited devices we recommend setting up a Resilio Sync service which allows to share all buletin board records in a p2p network.
-      </div> 
-    </div>
-    
-  </div>
-</div>
-
-</div>
-</div>
 
 </div>
 

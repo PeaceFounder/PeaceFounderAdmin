@@ -1,3 +1,27 @@
+<script>
+// Navigation
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the current URL path
+    var currentPath = window.location.pathname;
+
+    // Select all link elements within list items
+    var navLinks = document.querySelectorAll('li.nav-item a.nav-link');
+
+    navLinks.forEach(function(link) {
+        // Extract the href attribute from the link and form a path for comparison
+        var linkPath = '/' + link.getAttribute('href');
+
+        // Check if the current path starts with the link path
+        if (currentPath.startsWith(linkPath)) {
+            // Add 'active' class to the parent list item
+            link.parentElement.classList.add('active');
+        }
+    });
+});
+</script>
+
+
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- Primary Meta Tags -->
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

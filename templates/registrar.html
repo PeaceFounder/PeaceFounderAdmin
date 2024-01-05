@@ -1,0 +1,195 @@
+<!--
+
+=========================================================
+* Volt Free - Bootstrap 5 Dashboard
+=========================================================
+
+* Product Page: https://themesberg.com/product/admin-dashboard/volt-bootstrap-5-dashboard
+* Copyright 2021 Themesberg (https://www.themesberg.com)
+* License (https://themesberg.com/licensing)
+
+* Designed and coded by https://themesberg.com
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Please contact us to request a removal.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+  <head> 
+    <title>PeaceFounder - Electoral Roll</title>
+    <meta name="title" content="PeaceFounder - Electoral Roll">
+
+    {{>partials/head.html}}
+  </head>
+
+  <body>
+    
+    {{>partials/nav.html}}
+    {{>partials/sidenav.html}}
+    
+    <main class="content">
+
+      
+      <!--     "path": ".." -->
+      <!-- }) -->
+
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="d-block mb-4 mb-md-0">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+              <li class="breadcrumb-item">
+                <a href="/">
+                  <svg class="icon icon-xxs" style="padding-bottom: 4px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                  Deme
+                </a>
+
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">Electoral Roll</li>
+            </ol>
+          </nav>
+          <h2 class="h4">Electoral Roll</h2>
+          <p class="mb-0"></p>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <form id="inviteForm" method="POST" action="/registrar">
+            <div class="input-group me-2 me-lg-3" style="max-width:600px; margin-right: 0px !important;">
+              <input name="name" type="text" class="form-control" placeholder="Some Name" required>
+              <input name="email" type="text" class="form-control" placeholder="email@somehere.org" required>
+              <a href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center" onclick="submitForm('inviteForm');">
+                <svg class="icon icon-xs me-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
+                Invite Member
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card card-body border-0 shadow table-wrapper table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th class="border-gray-200">#</th>
+              <th class="border-gray-200">Name</th>						
+              <th class="border-gray-200">Email</th>
+              <th class="border-gray-200">Issue Date</th>
+              <th class="border-gray-200">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Item -->
+            <tr>
+              <td>
+                <a href="#" class="fw-bold">
+                  2
+                </a>
+              </td>
+              <td>
+                <span class="fw-normal">Janis Erdmanis</span>
+              </td>
+              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
+              <td><span class="fw-normal">1 Jun 2020</span></td>
+              <td><span class="fw-bold text-warning">Trial</span></td>
+            </tr>
+            <!-- Item -->
+            <tr>
+              <td>
+                <a href="#" class="fw-bold">
+                  4
+                </a>
+              </td>
+              <td>
+                <span class="fw-normal">Janis Erdmanis</span>
+              </td>
+              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
+              <td><span class="fw-normal">1 Jun 2020</span></td>
+              <td><span class="fw-bold text-success">Verified</span></td>
+            </tr>
+            <!-- Item -->
+            <tr>
+              <td>
+                <a href="#" class="fw-bold">
+                  5
+                </a>
+              </td>
+              <td>
+                <span class="fw-normal">Janis Erdmanis</span>
+              </td>
+              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
+              <td><span class="fw-normal">1 Jun 2020</span></td>
+              <td><span class="fw-bold text-danger">Terminated</span></td>
+            </tr>
+            <!-- Item -->
+            <tr>
+              <td>
+                <a href="#" class="fw-bold text-success">
+                  Invited
+                </a>
+              </td>
+              <td>
+                <span class="fw-normal">Janis Erdmanis</span>
+              </td>
+              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
+              <td style="padding-top:5px; padding-bottom:0;"><button class="btn btn-sm btn-outline-danger"  type="button">Cancel</button></td>
+              <td style="padding-top:5px; padding-bottom:0;"><button class="btn btn-sm btn-outline-primary"  type="button">Retry</button></td>
+            </tr>
+            <!-- Item -->
+            <tr>
+              <td>
+                <a href="#" class="fw-bold text-success">
+                  Admitted
+                </a>
+              </td>
+              <td>
+                <span class="fw-normal">Janis Erdmanis</span>
+              </td>
+              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
+              <td><span class="fw-normal">1 Jun 2020</span></td>
+              <td><span class="fw-bold">Pending</span></td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <div id="under-construction" class="card-footer px-3 border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination mb-0">
+              <li class="page-item">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">1</a>
+              </li>
+              <li class="page-item active">
+                <a class="page-link" href="#">2</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">3</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">4</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">5</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            </ul>
+          </nav>
+          <div class="fw-normal small mt-4 mt-lg-0">Showing <b>5</b> out of <b>25</b> entries</div>
+        </div>
+      </div>
+      
+
+      {{>partials/footer.html}}
+
+    </main>
+
+    {{>partials/scripts.html}}
+    
+  </body>
+
+</html>
