@@ -79,76 +79,19 @@
             </tr>
           </thead>
           <tbody>
+            
+            {{#TABLE}}
             <!-- Item -->
             <tr>
+              <td>{{{REGISTRATION}}}</td>
               <td>
-                <a href="#" class="fw-bold">
-                  2
-                </a>
+                <span class="fw-normal">{{NAME}}</span>
               </td>
-              <td>
-                <span class="fw-normal">Janis Erdmanis</span>
-              </td>
-              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
-              <td><span class="fw-normal">1 Jun 2020</span></td>
-              <td><span class="fw-bold text-warning">Trial</span></td>
+              <td><span class="fw-normal">{{EMAIL}}</span></td>                        
+              <td><span class="fw-normal">{{TIMESTAMP}}</span></td>
+              {{{STATUS}}}
             </tr>
-            <!-- Item -->
-            <tr>
-              <td>
-                <a href="#" class="fw-bold">
-                  4
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Janis Erdmanis</span>
-              </td>
-              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
-              <td><span class="fw-normal">1 Jun 2020</span></td>
-              <td><span class="fw-bold text-success">Verified</span></td>
-            </tr>
-            <!-- Item -->
-            <tr>
-              <td>
-                <a href="#" class="fw-bold">
-                  5
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Janis Erdmanis</span>
-              </td>
-              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
-              <td><span class="fw-normal">1 Jun 2020</span></td>
-              <td><span class="fw-bold text-danger">Terminated</span></td>
-            </tr>
-            <!-- Item -->
-            <tr>
-              <td>
-                <a href="#" class="fw-bold text-success">
-                  Invited
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Janis Erdmanis</span>
-              </td>
-              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
-              <td style="padding-top:5px; padding-bottom:0;"><button class="btn btn-sm btn-outline-danger"  type="button">Cancel</button></td>
-              <td style="padding-top:5px; padding-bottom:0;"><button class="btn btn-sm btn-outline-primary"  type="button">Retry</button></td>
-            </tr>
-            <!-- Item -->
-            <tr>
-              <td>
-                <a href="#" class="fw-bold text-success">
-                  Admitted
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Janis Erdmanis</span>
-              </td>
-              <td><span class="fw-normal">akels14@gmail.com</span></td>                        
-              <td><span class="fw-normal">1 Jun 2020</span></td>
-              <td><span class="fw-bold">Pending</span></td>
-            </tr>
+            {{/TABLE}}
 
           </tbody>
         </table>

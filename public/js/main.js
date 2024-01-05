@@ -200,8 +200,23 @@ function submitFormsReload(formIds) {
 
 
 
-
-
-
-
-
+function sendSignal(action, method) {
+    fetch(action, { method: method })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url; // Redirect to the new URL
+            } else {
+                return response.json(); // Process the response as JSON
+            }
+        })
+        .then(data => {
+            if (data) {
+                console.log('Success:', data);
+                // Handle success response
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            // Handle errors
+        });
+}

@@ -194,6 +194,7 @@ end
     return Mustache.render(tmpl; title, uuid, group_name, hash_name, guardian_pbkey, roles, commit) |> html
 end 
 
+
 @post "/setup-summary" function(req::Request)
 
     Mapper.capture!(DEMESPEC_CANDIDATE[])
@@ -236,47 +237,6 @@ end
 end
 
 
-
-# For testing purposes
-function init_state()
-
-    title = "Some Community"
-    hash = "sha256"
-    group = "EC: P_192"
-
-    crypto = CryptoSpec(hash, group)
-
-    guardian = generate(Signer, crypto)
-    proposer = generate(Signer, crypto)
-    
-    Mapper.initialize!(crypto)
-
-    roles = Mapper.system_roles()
-    
-    spec = DemeSpec(;
-                    uuid = UUIDs.uuid4(),
-                    title = title,
-                    crypto = crypto,
-                    guardian = id(guardian),
-                    recorder = roles.recorder,
-                    recruiter = roles.recruiter,
-                    braider = roles.braider,
-                    proposer = id(proposer),
-                    collector = roles.collector
-                    ) |> approve(guardian)
-    
-
-    Mapper.capture!(spec)
-
-    SETTINGS["SMTP_EMAIL"] = "demeregistrar@inbox.lv"
-    SETTINGS["SMTP_SERVER"] = "smtps://mail.inbox.lv:465"
-    #SETTINGS["SMTP_PASSWORD"] = ENV["RECRUIT_EMAIL_PASSWORD"] 
-    SETTINGS["SMTP_PASSWORD"] = ENV["REGISTRAR_PASSWORD"] 
-
-    return    
-end
-
-init_state()
 
 
 function test_smtp((; email))
@@ -335,7 +295,7 @@ end
 
 using Dates
 
-
+# MemberState is something like an Union type here.
 abstract type MemberState end
 
 struct Invited <: MemberState 
@@ -347,7 +307,8 @@ struct Admitted <: MemberState
 end
 
 struct Registered <: MemberState
-    index::Int
+    registered::Int
+    #index::Int
     verified::Bool
 end
 
@@ -526,20 +487,90 @@ end
 
 
 
-
-@get "/registrar" function(req::Request)
-    
-    return render(joinpath(TEMPLATES, "registrar.html")) |> html
+struct MemberProfileView
+    TICKETID::String # This is good to have for intermediate actions, I could also try TicketID
+    NAME::String
+    EMAIL::String
+    TIMESTAMP::String 
+    REGISTRATION::String # Can be HTML and etc. Whatever works here
+    STATUS::String
 end
 
 
-@post "/registrar" function(req::Request)
+function construct_view(profile::MemberProfile)
 
-    # Let's do this
-    (; name, email) = json(req)
+    (; name, email, ticketid, created, state) = profile
 
-    profile = create_profile(name, email)
-    invite = create_invite(profile)
+    NAME = name
+    EMAIL = email
+    TICKETID = bytes2hex(ticketid)
+    #TIMESTAMP = Dates.format(created, "yyyy-u-dd HH:MM")
+
+    #TIMESTAMP = Dates.format(created, "u dd, yyyy, HH:MM")
+
+    TIMESTAMP = Dates.format(created, "d u yyyy, HH:MM")
+
+    STATUS_ACTIONS = """
+<td style="padding-top:5px; padding-bottom:0;">
+<button class="btn btn-sm btn-outline-danger" style="margin-right: 5px;" type="button" onclick="sendSignal('registrar/$TICKETID', 'DELETE');">Cancel</button>
+<button class="btn btn-sm btn-outline-primary" type="button" onclick="sendSignal('registrar/$TICKETID', 'PUT');">Retry</button></td>
+        """
+
+    if state isa Invited
+
+        STATUS = STATUS_ACTIONS
+
+        if state.expired
+            REGISTRATION = """<a href="#" class="fw-bold text-danger">Invited-Expired</a>"""
+        else
+            REGISTRATION = """<a href="#" class="fw-bold text-success">Invited</a>"""
+        end
+
+    elseif state isa Admitted
+
+        if state.expired
+
+            REGISTRATION = """<a href="#" class="fw-bold text-danger">Admitted-Expired</a>"""
+            STATUS = STATUS_ACTIONS
+
+        else
+
+            REGISTRATION = """<a href="#" class="fw-bold text-success">Admitted</a>"""
+            STATUS = """<td><span class="fw-bold">Pending</span></td>"""
+
+        end
+
+    elseif state isa Registered
+        
+        REGISTRATION = string(state.registered)
+
+        if state.verified
+            STATUS = """<td><span class="fw-bold text-success">Verified</span></td>"""
+        else
+            STATUS = """<td><span class="fw-bold text-warning">Trial</span></td>"""
+        end
+
+    elseif state isa Terminated
+
+        REGISTRATION = string(state.registered)
+        STATUS = """<td><span class="fw-bold text-danger">Terminated</span></td>"""
+
+    end
+
+    return MemberProfileView(TICKETID, NAME, EMAIL, TIMESTAMP, REGISTRATION, STATUS)
+end
+
+@get "/registrar" function(req::Request)
+
+    profiles = MemberProfileView[construct_view(i) for i in ELECTORAL_ROLL.ledger]
+    
+    return render(joinpath(TEMPLATES, "registrar.html"), Dict("TABLE"=>profiles)) |> html
+end
+
+
+function send(invite::Invite, profile::MemberProfile)
+
+    (; name, email) = profile
 
     invite_code = String(PeaceFounder.Parser.marshal(invite))
 
@@ -562,57 +593,55 @@ end
         SMTPClient.send(SETTINGS["SMTP_SERVER"], [email], SETTINGS["SMTP_EMAIL"], IOBuffer(body), opt)
     end
 
+end
+
+
+@post "/registrar" function(req::Request)
+
+    # Let's do this
+    (; name, email) = json(req)
+
+    profile = create_profile(name, email)
+    invite = create_invite(profile)
+
+    send(invite, profile)
+
     return Response(301, Dict("Location" => "/registrar"))    
 end
 
 
 
-struct MemberProfileView
-    TICKETID::String # This is good to have for intermediate actions, I could also try TicketID
-    NAME::String
-    EMAIL::String
-    TIMESTAMP::String 
-    REGISTRATION::String # Can be HTML and etc. Whatever works here
-    STATUS::String
+
+@delete "/registrar/{tid}" function(req::Request, tid::String)
+
+    ticketid = TicketID(hex2bytes(tid))
+
+    ticket_index = findfirst(x -> x.ticketid == ticketid, Mapper.RECRUITER[].tickets)
+    ticket = Mapper.RECRUITER[].tickets[ticket_index]
+
+    # A lock needs to be acquired here
+    @assert isnothing(ticket.admission) "Only in Invited state registration can be removed"
+    
+    deleteat!(Mapper.RECRUITER[].tickets, ticket_index)
+
+    roll_index = findfirst(x -> x.ticketid == ticketid, ELECTORAL_ROLL.ledger)
+    deleteat!(ELECTORAL_ROLL.ledger, roll_index)
+
+    return Response(301, Dict("Location" => "/registrar"))
 end
 
 
-function construct_view(profile::MemberProfile)
+@put "/registrar/{tid}" function(req::Request, tid::String)
 
-    (; name, email, ticketid, created, state) = profile
+    ticketid = TicketID(hex2bytes(tid))
 
-    NAME = name
-    EMAIL = email
-    TICKETID = bytes2hex(ticketid)
-    TIMESTAMP = string(created)
+    profile = get(ELECTORAL_ROLL, ticketid)
+    invite = create_invite(profile) # In this context create is of different meaning
 
-    if state isa Invited
+    send(invite, profile)
 
-        REGISTRATION = "Invited"
-        STATUS = "OK"
-
-    elseif state isa Admitted
-
-        REGISTRATION = "Admitted"
-        STATUS = "Pending"
-
-    elseif state isa Registered
-        
-        REGISTRATION = string(state.index)
-
-        if state.verified
-            STATUS = "Verified"
-        else
-            STATUS = "Trial"
-        end
-        
-    end
-
-    return MemberProfileView(TICKETID, NAME, EMAIL, TIMESTAMP, REGISTRATION, STATUS)
+    return Response(301, Dict("Location" => "/registrar"))
 end
-
-
-
 
 
 
@@ -624,6 +653,65 @@ end
 end
 
 
+
+
+
+
+
+
+
+
+
+# For testing purposes
+function init_test_state()
+
+    title = "Some Community"
+    hash = "sha256"
+    group = "EC: P_192"
+
+    crypto = CryptoSpec(hash, group)
+
+    guardian = generate(Signer, crypto)
+    proposer = generate(Signer, crypto)
+    
+    Mapper.initialize!(crypto)
+
+    roles = Mapper.system_roles()
+    
+    spec = DemeSpec(;
+                    uuid = UUIDs.uuid4(),
+                    title = title,
+                    crypto = crypto,
+                    guardian = id(guardian),
+                    recorder = roles.recorder,
+                    recruiter = roles.recruiter,
+                    braider = roles.braider,
+                    proposer = id(proposer),
+                    collector = roles.collector
+                    ) |> approve(guardian)
+    
+
+    Mapper.capture!(spec)
+
+    SETTINGS["SMTP_EMAIL"] = "demeregistrar@inbox.lv"
+    SETTINGS["SMTP_SERVER"] = "smtps://mail.inbox.lv:465"
+    #SETTINGS["SMTP_PASSWORD"] = ENV["RECRUIT_EMAIL_PASSWORD"] 
+    SETTINGS["SMTP_PASSWORD"] = ENV["REGISTRAR_PASSWORD"] 
+
+
+    
+    create_profile("Peter Parker", "DEBUG").state = Invited(false)
+    create_profile("Harry Potter", "DEBUG").state = Invited(true)
+    create_profile("Sherlock Holmes", "DEBUG").state = Admitted(false)
+    create_profile("Frodo Baggins", "DEBUG").state = Admitted(true)
+    create_profile("Walter White", "DEBUG").state = Registered(3, false)
+    create_profile("Indiana Jones", "DEBUG").state = Registered(3, true)
+    create_profile("Luke Skywalker", "DEBUG").state = Terminated(4, 6)
+
+    return
+end
+
+init_test_state()
 
 
 import HTTP
