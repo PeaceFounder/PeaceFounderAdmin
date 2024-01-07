@@ -185,7 +185,7 @@ end
     group_name = get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(crypto.group))
     hash_name = get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(crypto.hasher))
     
-    guardian_pbkey = chunk_string(string(guardian), 8) |> uppercase
+    guardian_pbkey = chunk_string(string(guardian), 8) #|> uppercase
 
     # For this one I would need to do key maangement manually
     roles = raw"<b>BraidChain</b>, <s>BallotBox</s>, <b>Registrar</b>, <s>Proposer</s>, <s>Braider</s>"
@@ -235,8 +235,6 @@ end
 
     return render(joinpath(TEMPLATES, "status.html"), DATA) |> html
 end
-
-
 
 
 function test_smtp((; email))
@@ -338,7 +336,7 @@ function get_registration_status(ticketid::TicketID)
         return Invited(false)
     end
 
-    registration_index = get_registration_index(PeaceFounder.Mapper.BRAID_CHAIN[].ledger, ticketid)
+    registration_index = get_registration_index(PeaceFounder.Mapper.BRAID_CHAIN[], ticketid)
 
     if isnothing(registration_index)
         return Admitted(false)
@@ -370,7 +368,7 @@ struct ElectoralRoll
 end
 
 ElectoralRoll() = ElectoralRoll(MemberProfile[])
-# sort by index
+# sort by indexv
 
 const ELECTORAL_ROLL = ElectoralRoll()
 
@@ -380,7 +378,11 @@ update!(profile::MemberProfile) = profile.state = get_registration_status(profil
 function update!(roll::ElectoralRoll)
 
     for profile in roll.ledger
-        update!(profile) 
+        try
+            update!(profile) 
+        catch
+            @warn "$(profile.name) can't be updated"
+        end
     end
 
     return
@@ -562,6 +564,8 @@ end
 
 @get "/registrar" function(req::Request)
 
+    update!(ELECTORAL_ROLL)
+
     profiles = MemberProfileView[construct_view(i) for i in ELECTORAL_ROLL.ledger]
     
     return render(joinpath(TEMPLATES, "registrar.html"), Dict("TABLE"=>profiles)) |> html
@@ -644,17 +648,197 @@ end
 end
 
 
+struct RecordView
+    INDEX::Int
+    TYPE::String
+    TIMESTAMP::String
+    ISSUER::String
+    TYPE_LOWERCASE::String
+end
+
+RecordView(index, type, timestamp, issuer) = RecordView(index, type, timestamp, issuer, lowercase(type))
 
 
+using PeaceFounder.Model: Transaction, DemeSpec, Member, NonceCommitment, BraidWork, Proposal, Lot
 
-@get "/buletinboard" function(req::Request)
+function row_view(record::Transaction, i::Int)
+
+    type = string(typeof(record))
+    timestamp = "unimplemented"
+    issuer = """<td><span class="fw-normal">unimplemented</span></td>"""
+
+    return RecordView(i, type, timestamp, issuer)
+end
+
+
+function row_view(record::DemeSpec, i::Int)
+
+    type = "DemeSpec"
+    timestamp = Dates.format(record.timestamp, "d u yyyy, HH:MM")
+    issuer = """<td><span class="fw-normal">Guardian</span></td>"""
     
-    return render(joinpath(TEMPLATES, "buletinboard.html")) |> html
+    return RecordView(i, type, timestamp, issuer)
+end
+
+
+function row_view(record::NonceCommitment, i::Int)
+
+    type = "NonceCommitment"
+    timestamp = "to be deprecated"
+    issuer = """<td><span class="fw-normal">#1.BraidChain</span></td>"""
+    
+    return RecordView(i, type, timestamp, issuer)
+end
+
+function row_view(record::Member, i::Int)
+
+    type = "Member"
+    timestamp = Dates.format(record.admission.timestamp, "d u yyyy, HH:MM")
+    issuer = """<td><span class="fw-normal">#1.Registrar</span></td>"""
+    
+    return RecordView(i, type, timestamp, issuer)
+end
+
+
+function row_view(record::BraidWork, i::Int)
+
+    type = "Braid"
+    timestamp = "unimplemented"
+    uuid = record.producer.uuid
+
+    issuer = """<td style="padding-top:5px; padding-bottom:0px;"><span class="fw-normal">#1.Braider<div style="font-size: 10px;">$uuid</div></span></td>"""
+    
+    return RecordView(i, type, timestamp, issuer)
+end
+
+
+function row_view(record::Proposal, i::Int)
+
+    type = "Proposal"
+    timestamp = Dates.format(record.open, "d u yyyy, HH:MM")
+    issuer = """<td><span class="fw-normal">#1.Proposer</span></td>"""
+
+    
+    return RecordView(i, type, timestamp, issuer)
+
+end
+
+function row_view(record::Lot, i::Int)
+
+    type = "Lot"
+    timestamp = "to be deprecated"
+    issuer = """<td><span class="fw-normal">#1.BraidChain</span></td>"""
+    
+    return RecordView(i, type, timestamp, issuer)
+
+end
+
+
+@get "/braidchain" function(req::Request)
+    
+    table = RecordView[row_view(r, i) for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger)]
+    
+    return render(joinpath(TEMPLATES, "buletinboard.html"), Dict("TABLE"=>table)) |> html
 end
 
 
 
+@get "/braidchain/{index}/demespec" function(req::Request, index::Int)
 
+    data = Dict("INDEX"=>index)
+    
+    return render(joinpath(TEMPLATES, "deme.html"), data) |> html
+end
+
+@get "/braidchain/{index}/member" function(req::Request, index::Int)
+
+    data = Dict("INDEX"=>index)
+    
+    return render(joinpath(TEMPLATES, "member.html"), data) |> html
+end
+
+@get "/braidchain/{index}/braid" function(req::Request, index::Int)
+    
+    data = Dict("INDEX"=>index)
+
+    return render(joinpath(TEMPLATES, "braid.html"), data) |> html
+end
+
+@get "/braidchain/{index}/proposal" function(req::Request, index::Int)
+    
+    data = Dict("INDEX"=>index)
+
+    return render(joinpath(TEMPLATES, "proposal_record.html"), data) |> html
+end
+
+@get "/braidchain/{index}/ballotbox" function(req::Request, index::Int)
+    
+    data = Dict("INDEX"=>index)
+
+    return render(joinpath(TEMPLATES, "proposal_ballotbox.html"), data) |> html
+end
+
+@get "/braidchain/{index}/tally" function(req::Request, index::Int)
+
+    data = Dict("INDEX"=>index)    
+
+    return render(joinpath(TEMPLATES, "proposal_tally.html"), data) |> html
+end
+
+
+@get "/braidchain/{index}/lot" function(req::Request, index::Int)
+    
+    data = Dict("INDEX"=>index)    
+
+    return Response(301, Dict("Location" => "/braidchain"))    
+end
+
+
+@get "/braidchain/{index}/noncecommitment" function(req::Request, index::Int)
+    
+    data = Dict("INDEX"=>index)
+
+    return Response(301, Dict("Location" => "/braidchain"))
+end
+
+
+
+@get "/braidchain/new-braid" function(req::Request)
+
+
+    spec = Mapper.BRAID_CHAIN[].ledger[1]
+
+    data = Dict()
+
+    data["TITLE"] = spec.title
+    data["UUID"] = spec.uuid
+    data["GUARDIAN"] = chunk_string(string(spec.guardian), 8) |> uppercase
+
+
+    return render(joinpath(TEMPLATES, "new-braid.html"), data) |> html
+end
+
+@post "/braidchain/new-braid" function(req::Request)
+
+    spec = Mapper.BRAID_CHAIN[].ledger[1]
+
+    input_generator = Mapper.get_generator()
+    input_members = Mapper.get_members()
+
+    braidwork = Model.braid(input_generator, input_members, spec, spec, Mapper.BRAIDER[]) 
+
+    Mapper.submit_chain_record!(braidwork)
+
+    return Response(301, Dict("Location" => "/braidchain"))
+end
+
+
+
+@get "/braidchain/new-proposal" function(req::Request)
+
+
+    return render(joinpath(TEMPLATES, "new-proposal.html")) |> html
+end
 
 
 
@@ -673,6 +857,8 @@ function init_test_state()
 
     guardian = generate(Signer, crypto)
     proposer = generate(Signer, crypto)
+
+    global PROPOSER[] = proposer # 
     
     Mapper.initialize!(crypto)
 
@@ -695,29 +881,86 @@ function init_test_state()
 
     SETTINGS["SMTP_EMAIL"] = "demeregistrar@inbox.lv"
     SETTINGS["SMTP_SERVER"] = "smtps://mail.inbox.lv:465"
-    #SETTINGS["SMTP_PASSWORD"] = ENV["RECRUIT_EMAIL_PASSWORD"] 
     SETTINGS["SMTP_PASSWORD"] = ENV["REGISTRAR_PASSWORD"] 
 
 
+    # For debugging the Electoral Roll view
+    # create_profile("Peter Parker", "DEBUG").state = Invited(false)
+    # create_profile("Harry Potter", "DEBUG").state = Invited(true)
+    # create_profile("Sherlock Holmes", "DEBUG").state = Admitted(false)
+    # create_profile("Frodo Baggins", "DEBUG").state = Admitted(true)
+    # create_profile("Walter White", "DEBUG").state = Registered(3, false)
+    # create_profile("Indiana Jones", "DEBUG").state = Registered(3, true)
+    # create_profile("Luke Skywalker", "DEBUG").state = Terminated(4, 6)
+
+
+    profile = create_profile("Lisbeth Salander", "DEBUG")
+    invite = create_invite(profile)
+    lisbeth = Client.DemeClient()
+    Client.enroll!(lisbeth, invite, key = 2)
+
+    profile = create_profile("Dorian Gray", "DEBUG")
+    invite = create_invite(profile)
+    dorian = Client.DemeClient()
+    Client.enroll!(dorian, invite, key = 3)
     
-    create_profile("Peter Parker", "DEBUG").state = Invited(false)
-    create_profile("Harry Potter", "DEBUG").state = Invited(true)
-    create_profile("Sherlock Holmes", "DEBUG").state = Admitted(false)
-    create_profile("Frodo Baggins", "DEBUG").state = Admitted(true)
-    create_profile("Walter White", "DEBUG").state = Registered(3, false)
-    create_profile("Indiana Jones", "DEBUG").state = Registered(3, true)
-    create_profile("Luke Skywalker", "DEBUG").state = Terminated(4, 6)
+    profile = create_profile("Winston Smith", "DEBUG") #Holly Golightly
+    invite = create_invite(profile)
+    winston = Client.DemeClient()
+    Client.enroll!(winston, invite, key = 4)
+
+    # Self-Braiding
+
+    input_generator = Mapper.get_generator()
+    input_members = Mapper.get_members()
+
+    braidwork = Model.braid(input_generator, input_members, spec, spec, Mapper.BRAIDER[]) 
+
+    Mapper.submit_chain_record!(braidwork)
+
+    # Adding of a proposal
+
+    commit = Mapper.BRAID_CHAIN[].commit
+
+    proposal = Proposal(
+        uuid = UUIDs.uuid4(),
+        summary = "Should the city ban all personal vehicle usage and invest in alternative forms of transportation such as public transit, biking and walking infrastructure?",
+        description = "",
+        ballot = Ballot(["yes", "no"]),
+        open = Dates.now(),
+        closed = Dates.now() + Dates.Second(600),
+        collector = roles.collector, # should be deprecated
+
+        state = commit.state
+    ) |> approve(PROPOSER[])
+
+
+    index = Mapper.submit_chain_record!(proposal).proof.index
+
+    # Adding few votes
+
+    sleep(1)
+
+    Client.update_deme!(lisbeth, spec.uuid)
+    Client.update_deme!(dorian, spec.uuid)
+    Client.update_deme!(winston, spec.uuid)
+    
+    Client.cast_vote!(lisbeth, spec.uuid, index, Selection(2))
+    Client.cast_vote!(dorian, spec.uuid, index, Selection(1))
+    Client.cast_vote!(winston, spec.uuid, index, Selection(2))
 
     return
 end
-
-init_test_state()
 
 
 import HTTP
 
 try
     global service = HTTP.serve!(PeaceFounder.Service.ROUTER, "0.0.0.0", SERVER_PORT[])
+
+    sleep(0.1) # 
+    init_test_state()
+
     Oxygen.serve(port=3221)
 finally 
     close(service)

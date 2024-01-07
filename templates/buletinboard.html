@@ -50,19 +50,19 @@
           <h2 class="h4">BraidChain Ledger</h2>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
-          <a href="newbraid.html" class="btn btn-sm btn-tertiary d-inline-flex align-items-center">
+          <a href="/braidchain/new-braid" class="btn btn-sm btn-tertiary d-inline-flex align-items-center">
             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             New Braid
           </a>
           
 
-          <a href="newproposal.html" class="btn btn-sm btn-primary d-inline-flex align-items-center ms-2">
+          <a href="/braidchain/new-proposal" class="btn btn-sm btn-primary d-inline-flex align-items-center ms-2">
             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             New Proposal
           </a>
         </div>
       </div>
-      <div id="under-construction" class="card card-body border-0 shadow table-wrapper table-responsive">
+      <div class="card card-body border-0 shadow table-wrapper table-responsive">
         <table class="table table-hover ">
           <thead>
             <tr>
@@ -73,125 +73,19 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Item -->
-            <tr data-href="deme.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  1
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Deme</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">Guardian</span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="member.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  2
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Member</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Registrar</span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="member.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  3
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Member</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Registrar</span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="member.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  4
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Member</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Registrar</span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="member.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  5
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Member</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Registrar</span></td>
-            </tr>
-            <!-- Item -->
-            <tr style="padding-bottom:0;" data-href="braid.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  6
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Braid</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020 at 22.10</span></td>                        
-              <td style="padding-top:5px; padding-bottom:0px;"><span class="fw-normal">#1.Braider<div style="font-size: 10px;">31a120cc-b3cb-4d07-bbdb-d498660ddfd8</div></span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="proposal_record.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  7
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Proposal</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Proposer</span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="member.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  8
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Member</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Registrar</span></td>
-            </tr>
-            <!-- Item -->
-            <tr data-href="member.html">
-              <td>
-                <a href="#" class="fw-bold">
-                  9
-                </a>
-              </td>
-              <td>
-                <span class="fw-normal">Member</span>
-              </td>
-              <td><span class="fw-normal">1 May 2020</span></td>                        
-              <td><span class="fw-normal">#1.Registrar</span></td>
-            </tr>
-            <!-- Item -->
 
+            {{#TABLE}}
+            <tr data-href="braidchain/{{INDEX}}/{{TYPE_LOWERCASE}}">
+              <td>
+                <span class="fw-bold">{{INDEX}}</span>
+              </td>
+              <td>
+                <span class="fw-normal">{{TYPE}}</span>
+              </td>
+              <td><span class="fw-normal">{{TIMESTAMP}}</span></td>                        
+              {{{ISSUER}}}
+            </tr>
+            {{/TABLE}}
 
           </tbody>
         </table>

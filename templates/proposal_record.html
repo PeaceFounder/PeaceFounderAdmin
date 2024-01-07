@@ -1,0 +1,231 @@
+<!--
+
+=========================================================
+* Volt Free - Bootstrap 5 Dashboard
+=========================================================
+
+* Product Page: https://themesberg.com/product/admin-dashboard/volt-bootstrap-5-dashboard
+* Copyright 2021 Themesberg (https://www.themesberg.com)
+* License (https://themesberg.com/licensing)
+
+* Designed and coded by https://themesberg.com
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Please contact us to request a removal.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+
+  <title>PeaceFounder - BraidChain/Proposal</title>
+  <meta name="title" content="PeaceFounder - BraidChain/Proposal">
+  {{>partials/head.html}}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    var data = {
+        labels: ['0', '1', '2', '3', '4', '5', '6'],
+        series: [[3, 3, 2, 1, 0, 0, 0]]
+    };
+
+    var options = {
+        width: '100%',
+        showArea: true,
+        lineSmooth: Chartist.Interpolation.step(),
+
+        axisY: {
+            labelInterpolationFnc: function(value) {
+                if (value % 1 === 0) {
+                    return value; 
+                } else {
+                    return null; 
+                }
+            }
+        },
+
+    };
+
+    new Chartist.Line('.ct-chart-sales-value2', data, options);
+});
+
+</script>
+
+<style>
+  .ct-grid.ct-vertical {
+    display: none;
+  }
+</style>
+
+</head>
+
+<body>
+
+
+  {{>partials/nav.html}}
+  {{>partials/sidenav.html}}
+  
+  <main class="content">
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+      <div class="d-block mb-4 mb-md-0">
+        <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+          <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+            <li class="breadcrumb-item">
+              <a href="/">
+  <svg class="icon icon-xxs" style="padding-bottom: 4px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+  Deme
+</a>
+
+            </li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="/braidchain">BraidChain</a></li>
+            <li class="breadcrumb-item active" aria-current="page">#{{INDEX}}</li>
+            <li class="breadcrumb-item active" aria-current="page">Record</li>
+          </ol>
+        </nav>
+        <h2 class="h4">Proposal Record</h2>
+      </div>
+
+
+      <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group ms-2 ms-lg-3">
+          <button type="button" class="btn btn-sm btn-primary" onclick="window.location.href='/braidchain/{{INDEX}}/proposal';">Record</button> 
+          <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.location.href='/braidchain/{{INDEX}}/ballotbox';">BallotBox</button>
+          <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.location.href='/braidchain/{{INDEX}}/tally';">Tally</button>
+        </div>
+
+      </div>
+    </div>
+
+
+    
+    <div id="under-construction" class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
+
+      <h2 class="h5 mb-4">Summary</h2>
+
+
+
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">Proposal Title</label>
+        <div class="col-sm-9">
+          Who shall be a representative to the board?
+        </div>
+      </div>
+
+
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">UUID</label>
+        <div class="col-sm-9">
+          31a120cc-b3cb-4d07-bbdb-d498660ddfd8
+        </div>
+      </div>
+
+
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">Opens</label>
+        <div class="col-sm-9">
+          Jan 1st 2024 at 22:34
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">Closes</label>
+        <div class="col-sm-9">
+          Jan 3rd 2024 at 22:34
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">Releases</label>
+        <div class="col-sm-9">
+          Jan 15th 2024 at 22:34
+        </div>
+      </div>
+
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">Anchor</label>
+          <div class="col-sm-9">
+            #5
+          </div>
+        </div>
+      
+
+        <div class="row mb-0 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right; margin-top: -50px;">Anonimity Threshold</label>
+          <div class="col-sm-9" style="margin-left: -40px;">
+            <div class="col-12 col-xl-6 mb-3" style="margin: auto 0; padding-left: 0px;">
+              <div class="ct-chart-sales-value2 ct-double-octave ct-series-g" style="height: 200px; width: 500px;"></div>
+            </div>
+
+          </div>
+        </div>
+
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">Member Count</label>
+          <div class="col-sm-9">
+            4
+          </div>
+        </div>
+
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">BraidChain Tree Root</label>
+          <div class="col-sm-9">
+            5:04aa5d2533987c34839e8dbc8d8fcac86f0137e31c1c6ea4349ade4fcaf87ed8
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">Electoral Roll Tree Root</label>
+          <div class="col-sm-9">
+            24:04aa5d2533987c34839e8dbc8d8fcac86f0137e31c1c6ea4349ade4fcaf87ed8
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">Description</label>
+          <div class="col-sm-9">
+            A long descriptoin about the proposal
+          </div>
+        </div>
+
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">Ballot Type</label>
+          <div class="col-sm-9">
+            Simple Ballot
+          </div>
+        </div>
+
+
+        <div class="row mb-3 align-items-center">
+          <label class="h6 col-sm-3 mb-0" style="text-align: right;">Ballot</label>
+          <div class="col-sm-9">
+            <p style="margin-bottom: 0;">Option A</p>
+            <p style="margin-bottom: 0;">Option B</p>
+            <p style="margin-bottom: 0;">Option C</p>
+          </div>
+        </div>
+              
+
+      <div class="h7 mt-4">
+        Signed by #1.Proposer on Jan 1st 2024 at 22:34
+      </div>
+
+
+    </div>
+
+    {{>partials/footer.html}}
+
+  </main>
+
+  {{>partials/scripts.html}}
+  
+</body>
+
+</html>
