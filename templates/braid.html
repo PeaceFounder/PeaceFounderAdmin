@@ -54,7 +54,7 @@
             </div>
 
 
-            <div id="under-construction" class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
+            <div id="" class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
 
               <div class="d-flex justify-content-between">
 
@@ -67,29 +67,29 @@
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Title</label>
                 <div class="col-sm-9">
-                  The other democratic community
+                  {{DEME_TITLE}}
                 </div>
               </div>
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">UUID</label>
                 <div class="col-sm-9">
-                  916f7771-afe2-4319-943d-0e770c333432
+                  {{DEME_UUID}}
                 </div>
               </div>
 
               <div class="row mb-3 align-items-center">
-                <label class="h6 col-sm-3 mb-0" style="text-align: right;">Record</label>
+                <label class="h6 col-sm-3 mb-0" style="text-align: right;">DemeSpec</label>
                 <div class="col-sm-9">
-                  1
+                  <small>#1:{{HASHER}}:{{DEMESPEC_HASH}}</small>
                 </div>
               </div>
-
-              <div class="row mb-3 align-items-center">
-                <label class="h6 col-sm-3 mb-0" style="text-align: right;">SHA-256</label>
-                <div class="col-sm-9">
-                  FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA                </div>
-              </div>
+              
+              <!-- <div class="row mb-3 align-items-center"> -->
+              <!--   <label class="h6 col-sm-3 mb-0" style="text-align: right;">SHA-256</label> -->
+              <!--   <div class="col-sm-9"> -->
+              <!--     FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA                </div> -->
+              <!-- </div> -->
 
               <h2 class="h5 mb-4">Summary</h2>
 
@@ -97,14 +97,14 @@
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Member Count</label>
                 <div class="col-sm-9">
-                  5
+                  {{MEMBER_COUNT}}
                 </div>
               </div>
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Anonimity Threshold Gain</label>
                 <div class="col-sm-9">
-                  2
+                  {{ANONIMITY_THRESHOLD_GAIN}}
                 </div>
               </div>
 
@@ -112,21 +112,21 @@
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Input Generator</label>
                 <div class="col-sm-9">
-                  #1.Generator
+                  #{{INPUT_GENERATOR}}.Generator
                 </div>
               </div>              
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Input Pseudonyms</label>
                 <div class="col-sm-9">
-                  #1..., #2, #3, #4
+                  {{INPUT_PSEUDONYMS}}
                 </div>
               </div>              
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Output Generator</label>
                 <div class="col-sm-9">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+                  <small>{{OUTPUT_GENERATOR}}</small>
                 </div>
               </div>
 
@@ -134,40 +134,18 @@
               <h2 class="h5 mb-4">Output Pseudonyms</h2>
 
 
+              {{#TABLE}}
               <div class="row mb-3 align-items-center">
-                <label class="h6 col-sm-1 mb-0" style="text-align: right;">#6.1</label>
+                <label class="h6 col-sm-1 mb-0" style="text-align: right;">#6.{{ALIAS}}</label>
                 <div class="col-sm-11">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+                  <small>{{PSEUDONYM}}</small>
                 </div>
               </div>
-
-
-              <div class="row mb-3 align-items-center">
-                <label class="h6 col-sm-1 mb-0" style="text-align: right;">#6.2</label>
-                <div class="col-sm-11">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
-                </div>
-              </div>
-
-
-              <div class="row mb-3 align-items-center">
-                <label class="h6 col-sm-1 mb-0" style="text-align: right;">#6.3</label>
-                <div class="col-sm-11">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
-                </div>
-              </div>
-
-
-              <div class="row mb-3 align-items-center">
-                <label class="h6 col-sm-1 mb-0" style="text-align: right;">#6.4</label>
-                <div class="col-sm-11">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
-                </div>
-              </div>
+              {{/TABLE}}
 
 
               <div class="h7 mt-4">
-                Signed by #1.Braider@916f7771-afe2-4319-943d-0e770c333432 on Jan 1st 2024 at 22:34
+                Signed by #1.Braider@{{DEME_UUID}} on <span id="under-construction">Jan 1st 2024 at 22:34</span>
               </div>
 
             </div>

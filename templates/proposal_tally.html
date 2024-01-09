@@ -64,13 +64,13 @@
     </div>
 
 
-    <div id="under-construction" class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
+    <div class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
 
       <h2 class="h5 mb-4">Summary</h2>
 
 
-
-      <div class="row">
+      
+      <div id="under-construction" class="row">
         <div class="ct-chart-sales-value ct-double-octave ct-series-g" style="height: 200px; max-width: 800px; margin: 0 auto;"></div>
       </div>
 
@@ -79,21 +79,21 @@
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Cast Votes</label>
         <div class="col-sm-9">
-          130
+          {{VOTES_COUNT}}
         </div>
       </div>
 
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Valid Votes</label>
         <div class="col-sm-9">
-          120
+          {{VALID_VOTES_COUNT}}
         </div>
       </div>
 
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Participation</label>
         <div class="col-sm-9">
-          65%
+          {{PARTICIPATION}}
         </div>
       </div>
 
@@ -101,7 +101,7 @@
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">BallotBox Tree Root</label>
         <div class="col-sm-9">
-          130:04aa5d2533987c34839e8dbc8d8fcac86f0137e31c1c6ea4349ade4fcaf87ed8
+          <small> ⌘{{VOTES_COUNT}}:{{BALLOTBOX_TREE_ROOT}} </small>
         </div>
       </div>
 
@@ -109,9 +109,7 @@
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Tally</label>
         <div class="col-sm-9">
           <div class="col-sm-9">
-            <p style="margin-bottom: 0;">Option A : 23</p>
-            <p style="margin-bottom: 0;">Option B : 56</p>
-            <p style="margin-bottom: 0;">Option C : 32</p>
+            {{{TALLY}}}
           </div>
 
         </div>
@@ -120,14 +118,14 @@
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">BallotBox Release</label>
         <div class="col-sm-9">
-          Scheduled on Jan 1st 2024 at 22:34
+          {{{RELEASES}}} <!-- Jan 1st 2024 at 22:34 -->
         </div>
       </div>
 
 
       <div class="row justify-content-center mt-2">
         <div class="col-auto">
-          <button class="btn btn-primary" type="submit" style="width: 200px;">Release Votes Now</button>
+          <button {{{ACTION}}} class="btn btn-primary" type="submit" style="width: 200px;" onclick="sendSignal('/braidchain/{{INDEX}}/tally', 'POST');">Release Votes Now</button>
         </div>
       </div>
 

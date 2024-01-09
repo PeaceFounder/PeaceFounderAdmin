@@ -57,15 +57,16 @@
 
       <div class="row">
         <div style="max-width: 1024px;">
-          <div id="under-construction" class="card card-body border-0 shadow mb-4">
+          <div class="card card-body border-0 shadow mb-4">
             <h2 class="h5 mb-4">General Information</h2>
-            <form>
+
+            <form id="proposalForm" action="/braidchain/new-proposal" method="POST">
 
               <div class="row">
                 <div class="col-sm-12 mb-3">
                   <div class="form-group">
                     <label for="address">Title</label>
-                    <input class="form-control" id="address" type="text" placeholder="Enter Proposal Title" required>
+                    <input class="form-control" name="title" type="text" placeholder="Enter Proposal Title" required>
                   </div>
                 </div>
               </div>
@@ -78,8 +79,8 @@
                     <span class="input-group-text">
                       <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                     </span>
-                    <input data-datepicker="" dateFormat="dd/mm/yyyy" format="dd/mm/yyyy" class="form-control" id="birthday" type="text" placeholder="dd/mm/yyyy" required>                                               
-                    <input class="form-control" id="first_name" type="text" placeholder="00:00" required>                      
+                    <input data-datepicker="" dateFormat="dd/mm/yyyy" format="dd/mm/yyyy" class="form-control" type="text" placeholder="dd/mm/yyyy" value="{{TODAY}}" name="open_date" required>                                               
+                    <input class="form-control" name="open_time" type="text" placeholder="00:00">                      
                   </div>
                 </div>
 
@@ -90,8 +91,8 @@
                     <span class="input-group-text">
                       <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                     </span>
-                    <input data-datepicker="" class="form-control" id="birthday" type="text" placeholder="dd/mm/yyyy" required>
-                    <input class="form-control" id="first_name" type="text" placeholder="00:00" required>                      
+                    <input data-datepicker="" class="form-control" name="close_date" type="text" placeholder="dd/mm/yyyy" value="{{TOMORROW}}" required>
+                    <input class="form-control" type="text" name="close_time" placeholder="00:00">                      
                   </div>
                 </div>
 
@@ -100,19 +101,19 @@
 
 
               <div class="row align-items-center">
-                <div class="col-md-6 mb-3">
+                <div id="under-construction" class="col-md-6 mb-3">
                   <label for="birthday">Release</label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                     </span>
-                    <input data-datepicker="" class="form-control" id="birthday" type="text" placeholder="dd/mm/yyyy" required>                                               
-                    <input class="form-control" id="first_name" type="text" placeholder="00:00" required>                      
+                    <input data-datepicker="" class="form-control" name="release_date" type="text" placeholder="dd/mm/yyyy">                                               
+                    <input class="form-control" name="release_time" type="text" placeholder="00:00">                      
                   </div>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="gender">Anchor</label>
-                  <input class="form-control" id="first_name" type="text" placeholder="#7 (Current)" required>                      
+                  <input class="form-control" type="text" name="anchor" placeholder="#{{CURRENT_ANCHOR}} (Current)" value="">                      
                 </div>
               </div>
 
@@ -123,30 +124,34 @@
 
                 <div class="col-md-6 mb-3">
                   <label for="exampleFormControlTextarea1" class="form-label">Description</label>
-                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
+                  <textarea class="form-control" name="description" rows="15"></textarea>
                 </div>
 
                 <div class="col-md-6 mb-3">
                   
-                  <label for="gender">Ballot Type</label>
-                  <select class="form-select w-100 mb-0" id="state" name="state" aria-label="State select example">
-                    <option selected>Simple Ballot</option>
-                    <option>Preferential Ballot</option>
-                    <option>Cardinal Ballot</option>
-                  </select>
+                  <div id="under-construction">
+                    <label for="gender">Ballot Type</label>
+                    <select class="form-select w-100 mb-0" name="ballot_type" aria-label="State select example">
+                      <option selected>Simple Ballot</option>
+                      <option>Preferential Ballot</option>
+                      <option>Cardinal Ballot</option>
+                    </select>
+                  </div>
 
                   <label for="exampleFormControlTextarea1" class="form-label" style="padding-top: 13px;">Ballot</label>
-                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="11"></textarea>
-                </div>
-              </div>
-
-              <div class="row justify-content-center mt-2">
-                <div class="col-auto">
-                  <button class="btn btn-primary" type="submit" style="width: 200px;">Commit to BraidChain</button>
+                  <textarea class="form-control" name="ballot" id="exampleFormControlTextarea1" rows="11"></textarea>
                 </div>
               </div>
 
             </form>
+            
+              <div class="row justify-content-center mt-2">
+                <div class="col-auto">
+                  <button class="btn btn-primary" style="width: 200px;" onclick="submitForm('proposalForm');">Commit to BraidChain</button>
+                </div>
+              </div>
+
+     
           </div>
         </div>
       </div>

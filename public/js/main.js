@@ -205,9 +205,12 @@ function sendSignal(action, method) {
         .then(response => {
             if (response.redirected) {
                 window.location.href = response.url; // Redirect to the new URL
+                //window.location.reload(true);
             } else {
                 return response.json(); // Process the response as JSON
             }
+
+            //window.location.reload(true);
         })
         .then(data => {
             if (data) {

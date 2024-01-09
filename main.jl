@@ -1,3 +1,8 @@
+# This code is written intentionally bad, aimed at rapid development and overcoming creative blocks. 
+# It prioritizes speed and exploratory programming over best coding practices. 
+# It is not intended for production use and may contain inefficiencies and unconventional methods. 
+# Use this code as a starting point or for inspiration, rather than as a standard of quality.
+
 using Oxygen
 using HTTP: Request, Response
 using Mustache
@@ -10,7 +15,6 @@ using PeaceFounder.Model: CryptoSpec, pseudonym, TicketID, Member, Proposal, Bal
 
 
 import SMTPClient
-
 
 # 
 SERVER_PORT = Ref(4584)
@@ -703,7 +707,7 @@ end
 function row_view(record::BraidWork, i::Int)
 
     type = "Braid"
-    timestamp = "unimplemented"
+    timestamp = "unimplemented date"
     uuid = record.producer.uuid
 
     issuer = """<td style="padding-top:5px; padding-bottom:0px;"><span class="fw-normal">#1.Braider<div style="font-size: 10px;">$uuid</div></span></td>"""
@@ -718,9 +722,7 @@ function row_view(record::Proposal, i::Int)
     timestamp = Dates.format(record.open, "d u yyyy, HH:MM")
     issuer = """<td><span class="fw-normal">#1.Proposer</span></td>"""
 
-    
     return RecordView(i, type, timestamp, issuer)
-
 end
 
 function row_view(record::Lot, i::Int)
@@ -742,48 +744,302 @@ end
 end
 
 
-
 @get "/braidchain/{index}/demespec" function(req::Request, index::Int)
 
-    data = Dict("INDEX"=>index)
+    data = Dict()
+
+    data["INDEX"] = index
+    
+    spec = Mapper.BRAID_CHAIN[].ledger[index]
+
+    data["TITLE"] = spec.title
+    data["UUID"] = string(spec.uuid)
+    data["GROUP_NAME"] =  get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(spec.crypto.group))
+
+    data["HASH_NAME"] = get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(spec.crypto.hasher))
+
+    data["HASHER"] = string(spec.crypto.hasher)
+
+    data["GENERATOR"] = chunk_string(string(spec.crypto.generator), 8) |> uppercase
+
+
+    data["DEMESPEC_HASH"] = chunk_string(string(Model.digest(spec, spec.crypto.hasher)), 8) |> uppercase
+
+
+    data["GUARDIAN"] = chunk_string(string(spec.guardian), 8) |> uppercase
+
+    data["BRAID_CHAIN"] = chunk_string(string(spec.recorder), 8) |> uppercase
+
+    data["BALLOTBOX"] = chunk_string(string(spec.collector), 8) |> uppercase
+
+    data["REGISTRAR"] = chunk_string(string(spec.recruiter), 8) |> uppercase
+
+    data["PROPOSER"] = chunk_string(string(spec.proposer), 8) |> uppercase
+
+    data["BRAIDER"] = chunk_string(string(spec.braider), 8) |> uppercase
     
     return render(joinpath(TEMPLATES, "deme.html"), data) |> html
 end
 
 @get "/braidchain/{index}/member" function(req::Request, index::Int)
 
-    data = Dict("INDEX"=>index)
-    
+    data = Dict()
+    data["INDEX"] = index
+
+    record = Mapper.BRAID_CHAIN[].ledger[index]
+
+    data["GENERATOR"] = findprev(x -> x isa BraidWork || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1)
+    data["TICKETID"] = chunk_string(string(record.admission.ticketid), 8) |> uppercase
+    data["IDENTITY"] = chunk_string(string(record.admission.id), 8) |> uppercase
+    data["ISSUE_TIMESTAMP"] = Dates.format(record.admission.timestamp, "d u yyyy, HH:MM")
+    data["PSEUDONYM"] = chunk_string(string(record.pseudonym), 8) |> uppercase
+
     return render(joinpath(TEMPLATES, "member.html"), data) |> html
+end
+
+
+struct AliasView
+    ALIAS::Int
+    PSEUDONYM::String
 end
 
 @get "/braidchain/{index}/braid" function(req::Request, index::Int)
     
-    data = Dict("INDEX"=>index)
+    data = Dict()
+
+    data["INDEX"] = index
+
+    braid = Mapper.BRAID_CHAIN[].ledger[index]
+
+    data["DEME_TITLE"] = braid.producer.title
+    data["DEME_UUID"] = braid.producer.uuid
+    data["HASHER"] = string(braid.producer.crypto.hasher)
+
+    data["DEMESPEC_HASH"] = chunk_string(string(Model.digest(braid.producer, braid.producer.crypto.hasher)), 8) |> uppercase
+
+
+    pseudonyms = sort!([Model.output_members(braid)...])
+
+    data["OUTPUT_GENERATOR"] = chunk_string(string(Model.output_generator(braid)), 8) |> uppercase
+    data["TABLE"] = [AliasView(i, chunk_string(string(p), 8) |> uppercase) for (i, p) in enumerate(pseudonyms)]
+
+    data["MEMBER_COUNT"] = length(pseudonyms)
+
+
+    data["INPUT_GENERATOR"] = findprev(x -> x isa BraidWork || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1)
+
+    new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger) if r isa Member]
+
+    data["ANONIMITY_THRESHOLD_GAIN"] = length(new_members)
+
+
+    new_member_string = join(["#$i" for i in new_members], ", ")
+    
+    
+    if Mapper.BRAID_CHAIN[].ledger[data["INPUT_GENERATOR"]] isa BraidWork
+        data["INPUT_PSEUDONYMS"] = "#" * string(data["INPUT_GENERATOR"]) * "..., " * new_member_string
+    else
+        data["INPUT_PSEUDONYMS"] = new_member_string
+    end
+    #findprev(x -> x isa Braid || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index)
+
 
     return render(joinpath(TEMPLATES, "braid.html"), data) |> html
 end
 
 @get "/braidchain/{index}/proposal" function(req::Request, index::Int)
     
-    data = Dict("INDEX"=>index)
+    record = Dict()
+    record["INDEX"] = index
 
-    return render(joinpath(TEMPLATES, "proposal_record.html"), data) |> html
+    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+
+    record["TITLE"] = proposal.summary
+    record["UUID"] = proposal.uuid
+    record["OPENS"] = Dates.format(proposal.open, "d u yyyy, HH:MM")
+    record["CLOSES"] = Dates.format(proposal.closed, "d u yyyy, HH:MM")
+    record["ANCHOR"] = proposal.anchor.index
+    record["MEMBER_COUNT"] = proposal.anchor.member_count
+
+    # %sha256 and such could be used for denoting hash type
+
+    record["BRAIDCHAIN_ROOT"] = join(["#$(proposal.anchor.index)", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":")
+    record["ELECTORAL_ROLL_ROOT"] = join(["§334", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":")
+
+    record["DESCRIPTION"] = proposal.description
+    record["BALLOT_TYPE"] = "Simple Ballot"
+    #record["BALLOT"] = string(proposal.ballot)
+
+    record["BALLOT"] = join(["""<p style="margin-bottom: 0;"> $i </p>""" for i in proposal.ballot.options],"\n")
+
+    return render(joinpath(TEMPLATES, "proposal_record.html"), record) |> html
 end
+
+
+
+struct VoteView
+    CAST::Int
+    TIMESTAMP::String
+    PSEUDONYM::String
+    SEQ::Int
+    SELECTION::String
+    STATUS::String
+end
+
+
+using PeaceFounder.Model: CastRecord, Proposal, BraidWork, Pseudonym, Selection
+
+
+
+function Base.isless(a::Pseudonym, b::Pseudonym)
+    
+    len_a = length(a.pk)
+    len_b = length(b.pk)
+    minlen = min(len_a, len_b)
+
+    for i in 1:minlen
+        if a.pk[i] != b.pk[i]
+            return a.pk[i] < b.pk[i]
+        end
+    end
+
+    return len_a < len_b
+end
+
+
+
+function create_view(votes::Vector{CastRecord}, proposal::Proposal, braid::BraidWork)
+
+    # I would use the same thing in the 
+    pseudonyms = sort!([Model.output_members(braid)...])
+    
+    table = VoteView[]
+
+
+    for (cast, v) in enumerate(votes)
+
+        timestamp = Dates.format(v.timestamp, "d u yyyy, HH:MM")
+        
+        pindex = findfirst(x -> x == v.vote.approval.pbkey, pseudonyms)
+        seq = v.vote.seq
+
+        selection = string(v.vote.selection.option)
+
+        next_vote = findnext(x -> x.vote.approval.pbkey == v.vote.approval.pbkey && x.vote.seq >= v.vote.seq, votes, cast + 1)
+
+
+        if Model.isconsistent(v.vote.selection, proposal.ballot)
+
+            if isnothing(next_vote)
+                status = """<span class="fw-bold text-success">Valid</span>"""
+            else
+                status = """<span class="fw-bold text-warning">Overriden</span>""" # Overruled (used by higher outhorithy), Overloaded
+            end
+
+        else
+            status = """<span class="fw-bold text-danger">Malformed</span>"""
+        end
+
+
+        vote_view = VoteView(cast, timestamp, string(pindex), seq, selection, status)
+
+        push!(table, vote_view)
+    end
+
+    return table
+end
+
 
 @get "/braidchain/{index}/ballotbox" function(req::Request, index::Int)
     
-    data = Dict("INDEX"=>index)
+    data = Dict()
+
+    data["INDEX"] = index
+
+    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    bbox = Mapper.ballotbox(proposal.uuid)
+    braid = Mapper.BRAID_CHAIN[].ledger[proposal.anchor.index]
+
+    data["TABLE"] = create_view(bbox.ledger, proposal, braid)
 
     return render(joinpath(TEMPLATES, "proposal_ballotbox.html"), data) |> html
 end
 
+using Printf
+
+
+function format_percent(fraction)
+
+    number = fraction * 100
+
+    if isinteger(number)
+        return (@sprintf("%d", number)) * "%"  # Integer formatting
+    else
+        return (@sprintf("%.1f", number)) * "%"  # One decimal place formatting
+    end
+end
+
 @get "/braidchain/{index}/tally" function(req::Request, index::Int)
 
-    data = Dict("INDEX"=>index)    
+    data = Dict()    
+
+    data["INDEX"] = index
+    
+    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    bbox = Mapper.ballotbox(proposal.uuid)
+
+    data["VOTES_COUNT"] = bbox.commit.state.index
+
+    # Assumes that only valid pseudonyms have signed the votes, which is true
+    # for a record to be inlcuded into ballotbox ledger.
+    tally_bitmask = PeaceFounder.Model.tallyview(bbox.ledger, proposal.ballot)
+    
+    data["VALID_VOTES_COUNT"] = count(tally_bitmask)
+
+
+    data["PARTICIPATION"] = format_percent(count(tally_bitmask)/proposal.anchor.member_count)
+    
+    _tally = tally(proposal.ballot, PeaceFounder.Model.selections(bbox.ledger[tally_bitmask]))
+
+    lines = ""
+
+    for (o, t) in zip(proposal.ballot.options, _tally.data)
+
+        lines *= """<p style="margin-bottom: 0;">$o : $t</p>\n"""
+
+    end
+
+    #data["TALLY"] = string(_tally)
+    data["TALLY"] = lines
+    
+
+    data["BALLOTBOX_TREE_ROOT"] = chunk_string(string(bbox.commit.state.root), 8) |> uppercase # bytes2hex may be a better here
+    
+    
+    if isnothing(bbox.commit.state.tally)
+
+        data["RELEASES"] = "Scheduled on " * Dates.format(proposal.closed, "d u yyyy, HH:MM")
+
+    else
+        data["RELEASES"] = """Released on <span id="under-construction">6 Jan 2024, 23:00</span>"""
+        data["ACTION"] = """disabled="disabled" """
+
+    end
+
 
     return render(joinpath(TEMPLATES, "proposal_tally.html"), data) |> html
 end
+
+
+@post "/braidchain/{index}/tally" function(req::Request, index::Int)
+    
+    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    Mapper.tally_votes!(proposal.uuid)
+
+    return Response(301, Dict("Location" => "/braidchain/$index/tally"))
+    #return Response(301, Dict("Location" => "/braidchain/$index/tally"))
+end
+
 
 
 @get "/braidchain/{index}/lot" function(req::Request, index::Int)
@@ -836,14 +1092,140 @@ end
 
 @get "/braidchain/new-proposal" function(req::Request)
 
+    defaults = Dict()
 
-    return render(joinpath(TEMPLATES, "new-proposal.html")) |> html
+    defaults["TODAY"] = Dates.format(Dates.today(), "dd/mm/yyyy")
+    defaults["TOMORROW"] = Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy")
+    defaults["CURRENT_ANCHOR"] = findlast(x -> x isa BraidWork, Mapper.BRAID_CHAIN[].ledger)
+
+    return render(joinpath(TEMPLATES, "new-proposal.html"), defaults) |> html
+end
+
+
+using PeaceFounder.Model: generator, root, members, ChainState, BraidChain
+
+
+function _state(chain::BraidChain, index::Int)
+
+    g = generator(chain, index)
+    r = root(chain, index)
+    member_count = length(members(chain, index))
+
+    return ChainState(index, r, g, member_count)
 end
 
 
 
 
+@post "/braidchain/new-proposal" function(req::Request)
 
+     (; title, description, open_date, open_time, close_date, close_time, ballot_type, ballot, anchor, release_date, release_time) = json(req)
+
+    isempty(open_time) && (open_time="00:00")
+    isempty(close_time) && (close_time="00:00")
+
+    isempty(release_date) && (release_date=close_date)
+    isempty(release_time) && (release_time=close_time)
+
+
+    if isempty(anchor)
+        anchor_index = findlast(x -> x isa BraidWork, Mapper.BRAID_CHAIN[].ledger)
+    else
+        if anchor[1] == "#"
+            anchor_index = parse(Int, anchor[2:end])
+        else
+            anchor_index = parse(Int, anchor)
+        end
+    end
+
+    # I need to retrieve a state of the braidchain
+    anchor_state = _state(Mapper.BRAID_CHAIN[], anchor_index)
+
+    open_datetime = DateTime(join([open_date, open_time], " "), "dd/mm/yyyy HH:MM")
+    close_datetime = DateTime(join([close_date, close_time], " "), "dd/mm/yyyy HH:MM")
+    release_datetime = DateTime(join([release_date, release_time], " "), "dd/mm/yyyy HH:MM")
+
+    parsed_ballot = Ballot(split(ballot, "\n"))
+
+    roles = Mapper.system_roles()
+
+    proposal = Proposal(
+        uuid = UUIDs.uuid4(),
+        summary = title, # need to rename as title
+        description = description,
+        ballot = parsed_ballot,
+        open = open_datetime,
+        closed = close_datetime,
+        collector = roles.collector, # should be deprecated
+        
+        state = anchor_state # anchor, because the state is in the type
+    ) |> approve(PROPOSER[])
+
+
+    Mapper.submit_chain_record!(proposal)
+
+    return Response(301, Dict("Location" => "/braidchain"))
+end
+
+
+module Patch
+
+using Setfield
+using PeaceFounder.Model: digest, Vote, seal, generator, Signer, Digest, Proposal, Selection, hasher, BallotBox, Vote, pseudonym, isbinding, members, verify
+
+import PeaceFounder
+# This is a simple hack for the testing to go through. There is no intention to upstream it
+function PeaceFounder.Model.vote(proposal::Proposal, seed::Digest, selection::Selection, signer::Signer; seq = 1)
+
+    #@assert isconsistent(selection, proposal.ballot)
+
+    proposal_digest = digest(proposal, hasher(signer.spec))
+
+    #_seq = seq(signer, proposal_digest) + 1
+
+    vote = Vote(proposal_digest, seed, selection, seq)
+    approval = seal(vote, generator(proposal), signer::Signer)
+    
+    return @set vote.approval = approval
+end
+
+
+function PeaceFounder.Model.validate(ballotbox::BallotBox, vote::Vote)
+
+    @assert isbinding(vote, ballotbox.proposal, ballotbox.crypto) 
+    @assert pseudonym(vote) in members(ballotbox)
+
+    @assert verify(vote, generator(ballotbox), ballotbox.crypto)
+
+    return
+end
+
+
+# This is something that will need to be upstreamed
+using PeaceFounder.Model: Ballot, isconsistent, CastRecord
+
+
+
+function PeaceFounder.Model.tallyview(votes::Vector{CastRecord}, ballot::Ballot) # maybe valid_votes would be a better name
+    
+    valid_votes = BitVector(false for i in 1:length(votes))
+
+    for (i, v) in enumerate(votes)
+
+        if isconsistent(v.vote.selection, ballot)
+            next_vote = findnext(x -> x.vote.approval.pbkey == v.vote.approval.pbkey && x.vote.seq >= v.vote.seq, votes, i + 1)
+            if isnothing(next_vote)
+                valid_votes[i] = true
+            end
+        end
+    end
+
+    return valid_votes
+end
+
+
+
+end
 
 
 # For testing purposes
@@ -897,7 +1279,7 @@ function init_test_state()
     profile = create_profile("Lisbeth Salander", "DEBUG")
     invite = create_invite(profile)
     lisbeth = Client.DemeClient()
-    Client.enroll!(lisbeth, invite, key = 2)
+    Client.enroll!(lisbeth, invite, key = 4)
 
     profile = create_profile("Dorian Gray", "DEBUG")
     invite = create_invite(profile)
@@ -907,7 +1289,8 @@ function init_test_state()
     profile = create_profile("Winston Smith", "DEBUG") #Holly Golightly
     invite = create_invite(profile)
     winston = Client.DemeClient()
-    Client.enroll!(winston, invite, key = 4)
+    Client.enroll!(winston, invite, key = 5) # need to look into key attribute a
+    # Also randomness in ShuffleProofs seems to be fixated during compilation time and thus need to be improved.
 
     # Self-Braiding
 
@@ -926,7 +1309,7 @@ function init_test_state()
         uuid = UUIDs.uuid4(),
         summary = "Should the city ban all personal vehicle usage and invest in alternative forms of transportation such as public transit, biking and walking infrastructure?",
         description = "",
-        ballot = Ballot(["yes", "no"]),
+        ballot = Ballot(["Yes", "No"]),
         open = Dates.now(),
         closed = Dates.now() + Dates.Second(600),
         collector = roles.collector, # should be deprecated
@@ -937,6 +1320,8 @@ function init_test_state()
 
     index = Mapper.submit_chain_record!(proposal).proof.index
 
+
+    #23424:sha256:
     # Adding few votes
 
     sleep(1)
@@ -946,8 +1331,11 @@ function init_test_state()
     Client.update_deme!(winston, spec.uuid)
     
     Client.cast_vote!(lisbeth, spec.uuid, index, Selection(2))
-    Client.cast_vote!(dorian, spec.uuid, index, Selection(1))
     Client.cast_vote!(winston, spec.uuid, index, Selection(2))
+    Client.cast_vote!(dorian, spec.uuid, index, Selection(3))
+    Client.cast_vote!(dorian, spec.uuid, index, Selection(1))
+    Client.cast_vote!(winston, spec.uuid, index, Selection(1))
+    
 
     return
 end

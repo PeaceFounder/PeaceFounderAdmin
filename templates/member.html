@@ -54,28 +54,28 @@
             </div>
 
 
-            <div id="under-construction" class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
+            <div class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
 
               <h2 class="h5 mb-4">Admission</h2>
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">TicketID</label>
                 <div class="col-sm-9">
-                  FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50
+                  {{TICKETID}}
                 </div>
               </div>
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Identity</label>
                 <div class="col-sm-9">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+                  <small>{{IDENTITY}}</small>
                 </div>
               </div>
 
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Issue Date</label>
                 <div class="col-sm-9">
-                  2nd of January 2024
+                  {{ISSUE_TIMESTAMP}}
                 </div>
               </div>
 
@@ -91,22 +91,21 @@
               <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Generator</label>
                 <div class="col-sm-9">
-                  #1.Generator
+                  #{{GENERATOR}}.Generator
                 </div>
               </div>              
 
                             <div class="row mb-3 align-items-center">
                 <label class="h6 col-sm-3 mb-0" style="text-align: right;">Pseudonym</label>
                 <div class="col-sm-9">
-                  <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+                  <small>{{PSEUDONYM}}</small>
                 </div>
               </div>              
 
 
               <div class="h7 mt-4">
-                Signed by Member on Jan 1st 2024 at 22:34
+                Signed by Member on <span id="under-construction">Jan 1st 2024 at 22:34</span>
               </div>
-
 
               <!-- Title, UUID, Cryptographic Group, Hash Function,  -->
 

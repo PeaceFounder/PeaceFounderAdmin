@@ -62,14 +62,14 @@
     </div>
 
 
-    <div id="under-construction" class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
-      <h2 class="h5 mb-4">Summary</h2>
+    <div class="card card-body border-0 shadow mb-4" style="max-width: 1024px;">
+      <h2 class="h5 mb-4">Metadata</h2>
 
 
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Title</label>
         <div class="col-sm-9">
-          Local Democratic Community
+          {{TITLE}}
         </div>
       </div>
 
@@ -77,21 +77,32 @@
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">UUID</label>
         <div class="col-sm-9">
-          916f7771-afe2-4319-943d-0e770c333432 
+          {{UUID}}
         </div>
       </div>
+
+
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">DemeSpec</label>
+        <div class="col-sm-9">
+          <small>#{{INDEX}}:{{HASHER}}:{{DEMESPEC_HASH}}</small>
+        </div>
+      </div>
+
+
+    <h2 class="h5 mb-4 mt-4">Cryptography</h2>
 
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Cryptographic Group</label>
         <div class="col-sm-9">
-          Elliptic Curve P192
+          {{GROUP_NAME}}
         </div>
       </div>
 
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Generator</label>
         <div class="col-sm-9">
-          <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+          <small>{{GENERATOR}}</small>
         </div>
       </div>
 
@@ -99,71 +110,66 @@
       <div class="row mb-3 align-items-center">
         <label class="h6 col-sm-3 mb-0" style="text-align: right;">Hash Function</label>
         <div class="col-sm-9">
-          SHA-256
+          {{HASH_NAME}}
         </div>
       </div>
-
-      <div class="row mb-3 align-items-center">
-        <label class="h6 col-sm-3 mb-0" style="text-align: right;">Authorized Roles</label>
-        <div class="col-sm-9">
-          <b>BraidChain</b>, <s>BallotBox</s>, <b>Registrar</b>, <s>Proposer</s>, <s>Braider</s
-                                                                                              </div>
-      </div>
-    </div>
     
 
     <h2 class="h5 mb-4 mt-4">Roster</h2>
 
+      <div class="row mb-3 align-items-center">
+        <label class="h6 col-sm-3 mb-0" style="text-align: right;">Authorized Roles</label>
+        <div class="col-sm-9">
+          <b>BraidChain</b>, <b>BallotBox</b>, <b>Registrar</b>, <b>Proposer</b>, <b>Braider</b> <!-- Use <s> for disabling-->
+        </div>
+      </div>
+
+
     <div class="row mb-3 align-items-center">
       <label class="h6 col-sm-3 mb-0" style="text-align: right;">Guardian</label>
       <div class="col-sm-9">
-        <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+        <small>{{GUARDIAN}}</small>
       </div>
     </div>
-
 
     <div class="row mb-3 align-items-center">
       <label class="h6 col-sm-3 mb-0" style="text-align: right;">BraidChain</label>
       <div class="col-sm-9">
-        <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+        <small>{{BRAID_CHAIN}}</small>
       </div>
     </div>
-
-
 
     <div class="row mb-3 align-items-center">
       <label class="h6 col-sm-3 mb-0" style="text-align: right;">BallotBox</label>
       <div class="col-sm-9">
-        <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+        <small>{{BALLOTBOX}}</small>
       </div>
     </div>
 
     <div class="row mb-3 align-items-center">
       <label class="h6 col-sm-3 mb-0" style="text-align: right;">Registrar</label>
       <div class="col-sm-9">
-        <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+        <small>{{REGISTRAR}}</small>
       </div>
     </div>
 
     <div class="row mb-3 align-items-center">
       <label class="h6 col-sm-3 mb-0" style="text-align: right;">Proposer</label>
       <div class="col-sm-9">
-        <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+        <small>{{PROPOSER}}</small>
       </div>
     </div>
 
     <div class="row mb-3 align-items-center">
       <label class="h6 col-sm-3 mb-0" style="text-align: right;">Braider</label>
       <div class="col-sm-9">
-        <small>FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2 FBA2AAC6 47884B50 4EB8CD5A 0A1287BA BCC62163 F606A9A2</small>
+        <small>{{BRAIDER}}</small>
       </div>
     </div>
 
-
     <div class="h7 mt-4">
-      Signed by Guardian on Jan 1st 2024 at 22:34
+      Signed by Guardian on <span id="under-construction">Jan 1st 2024 at 22:34</span>
     </div>
-
 
 </div>
 {{>partials/footer.html}}
