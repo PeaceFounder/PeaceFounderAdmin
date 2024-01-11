@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     navLinks.forEach(function(link) {
         // Extract the href attribute from the link and form a path for comparison
-        var linkPath = '/' + link.getAttribute('href');
+        var linkPath = link.getAttribute('href');
 
         // Check if the current path starts with the link path
         if (currentPath.startsWith(linkPath)) {

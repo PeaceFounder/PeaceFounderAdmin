@@ -1,3 +1,15 @@
+name = "PeaceFounderAdmin"
+uuid = "71cbcc19-d5de-42ce-8f1e-a2372a8e1f1c"
+authors = ["Janis Erdmanis <janiserdmanis@protonmail.ch>"]
+version = "0.0.1"
+
+[bundle]
+APP_DISPLAY_NAME = "PeaceFounder Admin"
+APP_NAME = "peacefounder-admin"
+APP_SUMMARY = "PeaceFounder voting system server with an admin panel"
+BUNDLE_IDENTIFIER = "org.peacefounder.admin"
+WITH_SPLASH_SCREEN = false                  
+
 [deps]
 Cascadia = "54eefc05-d75b-58de-a785-1a3403f0919f"
 Gumbo = "708ec375-b3d6-5a57-a7ce-8257bf98657a"

@@ -25,16 +25,19 @@ function checkPasswordStrength() {
         return false;
     case 1:
         strengthBar.className = 'pw-very-weak';
-        strengthText.innerHTML = 'Very Weak <i class="zmdi zmdi-info"></i>';
+        //strengthText.innerHTML = 'Very Weak <i class="zmdi zmdi-info"></i>';
+        strengthText.innerHTML = 'Very Weak';
         return false;
     case 2:
         strengthBar.className = 'pw-mediocre';
-        strengthText.innerHTML = 'Moderate <i class="zmdi zmdi-info"></i>';
+        //strengthText.innerHTML = 'Moderate <i class="zmdi zmdi-info"></i>';
+        strengthText.innerHTML = 'Moderate';
         return false;
     case 3:
     case 4:
         strengthBar.className = 'pw-very-strong';
-        strengthText.innerHTML = 'Strong <i class="zmdi zmdi-info"></i>';
+        //strengthText.innerHTML = 'Strong <i class="zmdi zmdi-info"></i>';
+        strengthText.innerHTML = 'Strong';
         return true;
     }
 
@@ -52,12 +55,14 @@ function checkPasswordEquality() {
 
     if (password == password2) {
         strengthBar.className = 'pw-very-strong';
-        strengthText.innerHTML = 'Correct <i class="zmdi zmdi-info"></i>';
+        //strengthText.innerHTML = 'Correct <i class="zmdi zmdi-info"></i>';
+        strengthText.innerHTML = 'Correct';
 
         return true;
     } else {
         strengthBar.className = 'pw-very-weak';
-        strengthText.innerHTML = 'Does Not Match <i class="zmdi zmdi-info"></i>';
+        //strengthText.innerHTML = 'Does Not Match <i class="zmdi zmdi-info"></i>';
+        strengthText.innerHTML = 'Does Not Match';
 
         return false;
     }

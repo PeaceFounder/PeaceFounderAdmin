@@ -1,0 +1,23 @@
+name: {{APP_NAME}}
+base: core22
+version: '{{APP_VERSION}}'
+summary: {{APP_SUMMARY}}
+description: {{APP_DESCRIPTION}}
+grade: devel
+confinement: devmode
+
+apps:
+  {{APP_NAME}}:
+    command: bin/{{APP_NAME}}
+    daemon: simple
+    restart-condition: on-abnormal
+    plugs:
+    - home
+    - network
+    - network-bind
+
+
+hooks:
+  configure:
+    plugs:
+    - network
