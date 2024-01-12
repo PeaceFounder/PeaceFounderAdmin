@@ -35,13 +35,6 @@ const SETTINGS = Dict{String, String}()
 const SETTINGS_DEFAULT = Dict{String, String}()
 
 
-# The device will perform a following steps:
-#   - The device will retrieve deme specification parameters from provided address which will be compared with sotored hash in the invite
-#   - The cryptographic parameters will be initialised and a new key pair generated.
-#   - The public key will be authetificated with HMAC using the invite tooken and will be sent to the deme server which shall return the ppublic key signed by the registrar which whe shall reffer as admission certificate.
-#   - In the last step device retrieves the current braidchain generator and computes it's pseudonym. This together with admission certificate is signed by the member's private key which consistutes a member certificate. The member certificate is sent to the braidchain until History Tree inclusion proof is received concluding the process. If generator has changed a new pseudonym is recomputed.
-
-
 SETTINGS_DEFAULT["SMTP_EMAIL"] = ""
 SETTINGS_DEFAULT["SMTP_PASSWORD"] = ""
 SETTINGS_DEFAULT["SMTP_SERVER"] = ""
