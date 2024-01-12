@@ -4,10 +4,11 @@ authors = ["Janis Erdmanis <janiserdmanis@protonmail.ch>"]
 version = "0.0.1"
 
 [bundle]
-APP_DISPLAY_NAME = "PeaceFounder Admin"
-APP_NAME = "peacefounder-admin"
-APP_SUMMARY = "PeaceFounder voting system server with an admin panel"
-BUNDLE_IDENTIFIER = "org.peacefounder.admin"
+APP_DISPLAY_NAME = "PeaceFounder Server"
+APP_NAME = "peacefounder-server"
+APP_SUMMARY = "Privacy preserving and publically verifiable e-voting system for resource-constrained organisations."
+APP_DESCRITPION = "Discover PeaceFounder voting system: publically verifiable software independent, privacy uncompromising, user-friendly server solution with an advanced admin panel for effortless voting management. Ideal for organisations with limited deployment resources who want hard and ever-lasting evidence on integrity and a secure and accountable voting process."
+BUNDLE_IDENTIFIER = "org.peacefounder.server"
 WITH_SPLASH_SCREEN = false                  
 
 [deps]

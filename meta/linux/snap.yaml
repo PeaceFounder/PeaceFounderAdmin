@@ -4,10 +4,10 @@ version: '{{APP_VERSION}}'
 summary: {{APP_SUMMARY}}
 description: {{APP_DESCRIPTION}}
 grade: devel
-confinement: devmode
+confinement: strict
 
 apps:
-  {{APP_NAME}}:
+  daemon:
     command: bin/{{APP_NAME}}
     daemon: simple
     restart-condition: on-abnormal
@@ -15,7 +15,6 @@ apps:
     - home
     - network
     - network-bind
-
 
 hooks:
   configure:
