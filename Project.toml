@@ -3,22 +3,25 @@ uuid = "71cbcc19-d5de-42ce-8f1e-a2372a8e1f1c"
 authors = ["Janis Erdmanis <janiserdmanis@protonmail.ch>"]
 version = "0.0.1"
 
-[bundle]
-APP_DISPLAY_NAME = "PeaceFounder Server"
-APP_NAME = "peacefounder-server"
-APP_SUMMARY = "Privacy preserving and publically verifiable e-voting system for resource-constrained organisations."
-APP_DESCRITPION = "Discover PeaceFounder voting system: publically verifiable software independent, privacy uncompromising, user-friendly server solution with an advanced admin panel for effortless voting management. Ideal for organisations with limited deployment resources who want hard and ever-lasting evidence on integrity and a secure and accountable voting process."
-BUNDLE_IDENTIFIER = "org.peacefounder.server"
-WITH_SPLASH_SCREEN = false                  
-
 [deps]
 Cascadia = "54eefc05-d75b-58de-a785-1a3403f0919f"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Gumbo = "708ec375-b3d6-5a57-a7ce-8257bf98657a"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 Infiltrator = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
 Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
 Oxygen = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
 PeaceFounder = "916f7771-afe2-4319-943d-0e770c333432"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 SMTPClient = "c35d69d1-b747-5018-a192-25bc5e63c83d"
 Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
+[bundle]
+APP_DESCRITPION = "Discover PeaceFounder voting system: publically verifiable software independent, privacy uncompromising, user-friendly server solution with an advanced admin panel for effortless voting management. Ideal for organisations with limited deployment resources who want hard and ever-lasting evidence on integrity and a secure and accountable voting process."
+APP_DISPLAY_NAME = "PeaceFounder Server"
+APP_NAME = "peacefounder-server"
+APP_SUMMARY = "Privacy preserving and publically verifiable e-voting system for resource-constrained organisations."
+BUNDLE_IDENTIFIER = "org.peacefounder.server"
+WITH_SPLASH_SCREEN = false

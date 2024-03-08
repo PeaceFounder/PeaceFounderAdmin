@@ -23,8 +23,9 @@ end
 
 register(invite::String) = register(PeaceFounder.Parser.unmarshal(invite, Invite))
 
-@post "/register" function(req::Request)
+@post "/debug" function(req::Request)
 
+    @infiltrate
 
     invite = Parser.unmarshal(req.body, Invite)
     register(invite)
@@ -68,5 +69,6 @@ vote(proposal::Int, member::Int, selection::Int) = vote(proposal, member, Select
 
 
 isdefined(Main, :service) && close(service)
-global service = Oxygen.serve(host="0.0.0.0", port=3342, async=true)
+#global service = Oxygen.serve(host="0.0.0.0", port=3342, async=true)
+global service = Oxygen.serve(host="0.0.0.0", port=3342)
 
