@@ -2,38 +2,12 @@ using PeaceFounderAdmin
 
 using Dates
 using UUIDs
-using HTTP
 
 using PeaceFounder
 using PeaceFounder: Client, Mapper
 using PeaceFounder.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection
 
 
-# module Mock
-# # This is a simple hack for the testing to go through. There is no intention to upstream it
-
-# using Setfield
-# using PeaceFounder.Model: digest, Vote, seal, generator, Signer, Digest, Proposal, Selection, hasher
-
-# import PeaceFounder
-
-# function PeaceFounder.Model.vote(proposal::Proposal, seed::Digest, selection::Selection, signer::Signer; seq = 1)
-
-#     #@assert isconsistent(selection, proposal.ballot)
-
-#     proposal_digest = digest(proposal, hasher(signer.spec))
-
-#     #_seq = seq(signer, proposal_digest) + 1
-
-#     vote = Vote(proposal_digest, seed, selection, seq)
-#     approval = seal(vote, generator(proposal), signer::Signer)
-    
-#     return @set vote.approval = approval
-# end
-
-# end
-
-PORT::Int = 4589
 
 # For testing purposes
 function init_test_state()
@@ -158,7 +132,7 @@ end
 
 
 
-PeaceFounderAdmin.serve(server_port=PORT, server_middleware=[ReviseHandler], admin_middleware=[ReviseHandler]) do
+PeaceFounderAdmin.serve(server_middleware=[ReviseHandler], admin_middleware=[ReviseHandler]) do
 
     init_test_state()
 

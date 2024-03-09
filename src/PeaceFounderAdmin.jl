@@ -74,10 +74,10 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
     end
         
     server_service = PeaceFounder.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
-    admin_service = AdminService.serve(port=admin_port, middleware=admin_middleware)
+    admin_service = AdminService.serve(port=admin_port, middleware=admin_middleware, async=true)
     
     try 
-
+        
         mock()
         wait(admin_service)
 
