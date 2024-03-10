@@ -41,30 +41,14 @@ end
 # Isolates the setup phase from the dashboard
 function SetupMiddleware(handler)
     return function(req::Request)
-
         if startswith(req.target, "/static")
-
             return handler(req)
-
         else
-
             if req.target in ["/setup", "/configurator", "/setup-summary"] 
-
-                if SETUP_DONE
-                    return Response(302, Dict("Location" => "/"))
-                else
-                    return handler(req) # a more granular approach for the setup can be also done here
-                end
-                
+                return SETUP_DONE ? Response(302, Dict("Location" => "/")) : handler(req)
             else
-
-                if SETUP_DONE
-                    return handler(req)
-                else
-                    return Response(302, Dict("Location" => "/setup"))
-                end
+                return SETUP_DONE ? handler(req) : Response(302, Dict("Location" => "/setup"))
             end
-
         end
     end
 end
