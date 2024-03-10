@@ -134,7 +134,7 @@ end
 
     braid = Mapper.BRAID_CHAIN[].ledger[index]
 
-    pseudonyms = sort!([Model.output_members(braid)...])
+    output_members = Model.output_members(braid)
     new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger) if r isa Membership && i > input_generator]
     new_member_string = join(["#$i" for i in new_members], ", ")
 
@@ -151,8 +151,8 @@ end
         :HASHER => string(braid.producer.crypto.hasher),
         :DEMESPEC_HASH => chunk_string(string(Model.digest(braid.producer, braid.producer.crypto.hasher)), 8) |> uppercase,
         :OUTPUT_GENERATOR => chunk_string(string(Model.output_generator(braid)), 8) |> uppercase,
-        :TABLE => [AliasView(i, chunk_string(string(p), 8) |> uppercase) for (i, p) in enumerate(pseudonyms)],
-        :MEMBER_COUNT => length(pseudonyms),
+        :TABLE => [AliasView(i, chunk_string(string(p), 8) |> uppercase) for (i, p) in enumerate(output_members)],
+        :MEMBER_COUNT => length(output_members),
         :INPUT_GENERATOR => input_generator,
         :ANONIMITY_THRESHOLD_GAIN => length(new_members),
         :ISSUE_DATE => format_date_ordinal(braid.approval.timestamp),

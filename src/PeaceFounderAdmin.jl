@@ -12,7 +12,7 @@ import .AdminService: @get, @put, @post, @delete, Request, Response, dynamicfile
 
 
 const TEMPLATES = joinpath(dirname(@__DIR__), "templates")
-dynamicfiles(joinpath(dirname(@__DIR__), "public"), "/") # Static files would also be fine here
+dynamicfiles(joinpath(dirname(@__DIR__), "static"), "/static") # Static files would also be fine here
 
 
 include("utils.jl")
@@ -38,6 +38,38 @@ include("status.jl")
 end
 
 
+# Isolates the setup phase from the dashboard
+function SetupMiddleware(handler)
+    return function(req::Request)
+
+        if startswith(req.target, "/static")
+
+            return handler(req)
+
+        else
+
+            if req.target in ["/setup", "/configurator", "/setup-summary"] 
+
+                if SETUP_DONE
+                    return Response(302, Dict("Location" => "/"))
+                else
+                    return handler(req) # a more granular approach for the setup can be also done here
+                end
+                
+            else
+
+                if SETUP_DONE
+                    return handler(req)
+                else
+                    return Response(302, Dict("Location" => "/setup"))
+                end
+            end
+
+        end
+    end
+end
+
+
 function serve(mock::Function = () -> nothing; server_port=4584, server_host="127.0.0.1", server_route=nothing, admin_port=3221, admin_middleware=[], server_middleware=[])
 
     # This is the stage where the server may read out user ssettings to read out files
@@ -49,7 +81,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
     end
 
     server_service = PeaceFounder.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
-    admin_service = AdminService.serve(port=admin_port, middleware=admin_middleware, async=true)
+    admin_service = AdminService.serve(port=admin_port, middleware=[admin_middleware..., SetupMiddleware], async=true)
     
     try 
         
