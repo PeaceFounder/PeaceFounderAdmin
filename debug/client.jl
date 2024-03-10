@@ -1,8 +1,8 @@
 # Need to refactor to use DemeAccount directly
 
-using Infiltrator
+#using Infiltrator
 using Oxygen
-using HTTP: Request
+#using HTTP: Request
 
 using PeaceFounder: Client, Parser
 using PeaceFounder.Model: Selection
@@ -25,7 +25,7 @@ register(invite::String) = register(PeaceFounder.Parser.unmarshal(invite, Invite
 
 @post "/debug" function(req::Request)
 
-    @infiltrate
+    #@infiltrate
 
     invite = Parser.unmarshal(req.body, Invite)
     register(invite)
@@ -69,6 +69,5 @@ vote(proposal::Int, member::Int, selection::Int) = vote(proposal, member, Select
 
 
 isdefined(Main, :service) && close(service)
-#global service = Oxygen.serve(host="0.0.0.0", port=3342, async=true)
-global service = Oxygen.serve(host="0.0.0.0", port=3342)
+global service = Oxygen.serve(host="0.0.0.0", port=3342, async=true)
 

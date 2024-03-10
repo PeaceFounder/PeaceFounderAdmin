@@ -74,70 +74,52 @@ end
 
 @get "/braidchain" function(req::Request)
     
-    #table = RecordView[row_view(r, i) for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger) if r !(isa Union{Lot, NonceCommitment})]
-
     table = RecordView[row_view(r, i) for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger)]
     
-    return render(joinpath(TEMPLATES, "buletinboard.html"), Dict("TABLE"=>table)) |> html
+    #return render(joinpath(TEMPLATES, "buletinboard.html"), Dict("TABLE"=>table)) |> html
+
+    return render_template("buletinboard.html") <| [
+        :TABLE => table
+    ]
 end
 
 
 @get "/braidchain/{index}/demespec" function(req::Request, index::Int)
 
-    data = Dict()
-
-    data["INDEX"] = index
-    
     spec = Mapper.BRAID_CHAIN[].ledger[index]
 
-    data["TITLE"] = spec.title
-    data["UUID"] = string(spec.uuid)
-    data["GROUP_NAME"] =  get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(spec.crypto.group))
-
-    data["HASH_NAME"] = get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(spec.crypto.hasher))
-
-    data["HASHER"] = string(spec.crypto.hasher)
-
-    data["GENERATOR"] = chunk_string(string(spec.crypto.generator), 8) |> uppercase
-
-
-    data["DEMESPEC_HASH"] = chunk_string(string(Model.digest(spec, spec.crypto.hasher)), 8) |> uppercase
-
-
-    data["GUARDIAN"] = chunk_string(string(issuer(spec)), 8) |> uppercase
-
-    data["BRAID_CHAIN"] = chunk_string(string(spec.recorder), 8) |> uppercase
-
-    data["BALLOTBOX"] = chunk_string(string(spec.collector), 8) |> uppercase
-
-    data["REGISTRAR"] = chunk_string(string(spec.registrar), 8) |> uppercase
-
-    data["PROPOSER"] = chunk_string(string(spec.proposer), 8) |> uppercase
-
-    data["BRAIDER"] = chunk_string(string(spec.braider), 8) |> uppercase
-
-    data["ISSUE_DATE"] = format_date_ordinal(spec.seal.timestamp)
-    
-    return render(joinpath(TEMPLATES, "deme.html"), data) |> html
+    return render_template("deme.html") <| [
+        :INDEX => index,
+        :TITLE => spec.title,
+        :UUID => string(spec.uuid),
+        :GROUP_NAME => get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(spec.crypto.group)),
+        :HASH_NAME => get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(spec.crypto.hasher)),
+        :HASHER => string(spec.crypto.hasher),
+        :GENERATOR => chunk_string(string(spec.crypto.generator), 8) |> uppercase,
+        :DEMESPEC_HASH => chunk_string(string(Model.digest(spec, spec.crypto.hasher)), 8) |> uppercase,
+        :GUARDIAN => chunk_string(string(issuer(spec)), 8) |> uppercase,
+        :BRAID_CHAIN => chunk_string(string(spec.recorder), 8) |> uppercase,
+        :BALLOTBOX => chunk_string(string(spec.collector), 8) |> uppercase,
+        :REGISTRAR => chunk_string(string(spec.registrar), 8) |> uppercase,
+        :PROPOSER => chunk_string(string(spec.proposer), 8) |> uppercase,
+        :BRAIDER => chunk_string(string(spec.braider), 8) |> uppercase,
+        :ISSUE_DATE => format_date_ordinal(spec.seal.timestamp)
+    ]
 end
 
 @get "/braidchain/{index}/member" function(req::Request, index::Int)
 
-    data = Dict()
-    data["INDEX"] = index
-
     record = Mapper.BRAID_CHAIN[].ledger[index]
 
-    data["GENERATOR"] = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1)
-    data["TICKETID"] = chunk_string(string(record.admission.ticketid), 8) |> uppercase
-    data["IDENTITY"] = chunk_string(string(record.admission.id), 8) |> uppercase
-    data["ISSUE_TIMESTAMP"] = Dates.format(record.admission.seal.timestamp, "d u yyyy, HH:MM")
-    data["PSEUDONYM"] = chunk_string(string(record.pseudonym), 8) |> uppercase
-    data["ACK_TIMESTAMP"] = format_date_ordinal(record.admission.seal.timestamp)
-
-        #Dates.format(record.seal.timestamp, "d u yyyy, HH:MM")
-
-    return render(joinpath(TEMPLATES, "member.html"), data) |> html
+    return render_template("member.html") <| [
+        :INDEX => index,
+        :GENERATOR => findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1),
+        :TICKETID => chunk_string(string(record.admission.ticketid), 8) |> uppercase,
+        :IDENTITY => chunk_string(string(record.admission.id), 8) |> uppercase,
+        :ISSUE_TIMESTAMP => Dates.format(record.admission.seal.timestamp, "d u yyyy, HH:MM"),
+        :PSEUDONYM => chunk_string(string(record.pseudonym), 8) |> uppercase,
+        :ACK_TIMESTAMP => format_date_ordinal(record.admission.seal.timestamp)
+    ]
 end
 
 
@@ -148,94 +130,55 @@ end
 
 @get "/braidchain/{index}/braid" function(req::Request, index::Int)
     
-    data = Dict()
-
-    data["INDEX"] = index
+    input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1)
 
     braid = Mapper.BRAID_CHAIN[].ledger[index]
 
-    data["DEME_TITLE"] = braid.producer.title
-    data["DEME_UUID"] = braid.producer.uuid
-    data["HASHER"] = string(braid.producer.crypto.hasher)
-
-    data["DEMESPEC_HASH"] = chunk_string(string(Model.digest(braid.producer, braid.producer.crypto.hasher)), 8) |> uppercase
-
-
     pseudonyms = sort!([Model.output_members(braid)...])
-
-    data["OUTPUT_GENERATOR"] = chunk_string(string(Model.output_generator(braid)), 8) |> uppercase
-    data["TABLE"] = [AliasView(i, chunk_string(string(p), 8) |> uppercase) for (i, p) in enumerate(pseudonyms)]
-
-    data["MEMBER_COUNT"] = length(pseudonyms)
-
-
-    data["INPUT_GENERATOR"] = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1)
-
-    new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger) if r isa Membership && i > data["INPUT_GENERATOR"]]
-
-    data["ANONIMITY_THRESHOLD_GAIN"] = length(new_members)
-
-    data["ISSUE_DATE"] = format_date_ordinal(braid.approval.timestamp)
-
-
+    new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger) if r isa Membership && i > input_generator]
     new_member_string = join(["#$i" for i in new_members], ", ")
-    
-    
-    if Mapper.BRAID_CHAIN[].ledger[data["INPUT_GENERATOR"]] isa BraidReceipt
-        data["INPUT_PSEUDONYMS"] = "#" * string(data["INPUT_GENERATOR"]) * "..." * (!isempty(new_members) ? ", " * new_member_string : "")
+
+    if Mapper.BRAID_CHAIN[].ledger[input_generator] isa BraidReceipt
+        input_pseudonyms = "#" * string(input_generator) * "..." * (!isempty(new_members) ? ", " * new_member_string : "")
     else
-        data["INPUT_PSEUDONYMS"] = new_member_string
-    end
-    #findprev(x -> x isa Braid || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index)
+        input_pseudonyms = new_member_string
+    end    
 
-
-    return render(joinpath(TEMPLATES, "braid.html"), data) |> html
+    return  render_template("braid.html") <| [
+        :INDEX => index,
+        :DEME_TITLE => braid.producer.title,
+        :DEME_UUID => braid.producer.uuid,
+        :HASHER => string(braid.producer.crypto.hasher),
+        :DEMESPEC_HASH => chunk_string(string(Model.digest(braid.producer, braid.producer.crypto.hasher)), 8) |> uppercase,
+        :OUTPUT_GENERATOR => chunk_string(string(Model.output_generator(braid)), 8) |> uppercase,
+        :TABLE => [AliasView(i, chunk_string(string(p), 8) |> uppercase) for (i, p) in enumerate(pseudonyms)],
+        :MEMBER_COUNT => length(pseudonyms),
+        :INPUT_GENERATOR => input_generator,
+        :ANONIMITY_THRESHOLD_GAIN => length(new_members),
+        :ISSUE_DATE => format_date_ordinal(braid.approval.timestamp),
+        :INPUT_PSEUDONYMS => input_pseudonyms
+    ]
 end
 
 @get "/braidchain/{index}/proposal" function(req::Request, index::Int)
-    
-    record = Dict()
-    record["INDEX"] = index
 
     proposal = Mapper.BRAID_CHAIN[].ledger[index]
 
-    record["TITLE"] = proposal.summary
-    record["UUID"] = proposal.uuid
-    record["OPENS"] = Dates.format(proposal.open, "d u yyyy, HH:MM")
-    record["CLOSES"] = Dates.format(proposal.closed, "d u yyyy, HH:MM")
-    record["ANCHOR"] = proposal.anchor.index
-    record["MEMBER_COUNT"] = proposal.anchor.member_count
-
-    # %sha256 and such could be used for denoting hash type
-
-    record["BRAIDCHAIN_ROOT"] = join(["#$(proposal.anchor.index)", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":")
-    record["ELECTORAL_ROLL_ROOT"] = join(["§334", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":")
-
-    record["DESCRIPTION"] = proposal.description
-    record["BALLOT_TYPE"] = "Simple Ballot"
-    #record["BALLOT"] = string(proposal.ballot)
-
-    record["BALLOT"] = join(["""<p style="margin-bottom: 0;"> $i </p>""" for i in proposal.ballot.options],"\n")
-
-    record["ISSUE_DATE"] = format_date_ordinal(proposal.approval.timestamp)
-
-    return render(joinpath(TEMPLATES, "proposal_record.html"), record) |> html
-end
-
-
-@get "/braidchain/{index}/lot" function(req::Request, index::Int)
-    
-    data = Dict("INDEX"=>index)    
-
-    return Response(301, Dict("Location" => "/braidchain"))    
-end
-
-
-@get "/braidchain/{index}/noncecommitment" function(req::Request, index::Int)
-    
-    data = Dict("INDEX"=>index)
-
-    return Response(301, Dict("Location" => "/braidchain"))
+    return render_template("proposal_record.html") <| [
+        :INDEX => index,
+        :TITLE => proposal.summary,
+        :UUID => proposal.uuid,
+        :OPENS => Dates.format(proposal.open, "d u yyyy, HH:MM"),
+        :CLOSES => Dates.format(proposal.closed, "d u yyyy, HH:MM"),
+        :ANCHOR => proposal.anchor.index,
+        :MEMBER_COUNT => proposal.anchor.member_count,
+        :BRAIDCHAIN_ROOT => join(["#$(proposal.anchor.index)", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":"),
+        :ELECTORAL_ROLL_ROOT => join(["§334", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":"),
+        :DESCRIPTION => proposal.description,
+        :BALLOT_TYPE => "Simple Ballot",
+        :BALLOT => join(["""<p style="margin-bottom: 0;"> $i </p>""" for i in proposal.ballot.options],"\n"), # BALLOT_SPEC?
+        :ISSUE_DATE => format_date_ordinal(proposal.approval.timestamp)
+    ]
 end
 
 
@@ -251,8 +194,6 @@ end
         return Response(301, Dict("Location" => "/braidchain/$index/proposal"))
     elseif record isa BraidReceipt
         return Response(301, Dict("Location" => "/braidchain/$index/braid"))
-    else record isa Union{Lot, NonceCommitment}
-        return  Response(301, Dict("Location" => "/braidchain"))
     end
 end
 
@@ -261,13 +202,18 @@ end
 
     spec = Mapper.get_demespec()
 
-    data = Dict()
+    # data = Dict()
 
-    data["TITLE"] = spec.title
-    data["UUID"] = spec.uuid
-    data["GUARDIAN"] = chunk_string(string(issuer(spec)), 8) |> uppercase
+    # data["TITLE"] = spec.title
+    # data["UUID"] = spec.uuid
+    # data["GUARDIAN"] = chunk_string(string(issuer(spec)), 8) |> uppercase
 
-    return render(joinpath(TEMPLATES, "new-braid.html"), data) |> html
+    #return render(joinpath(TEMPLATES, "new-braid.html"), data) |> html
+    return render_template("new-braid.html") <| [
+        :TITLE => spec.title,
+        :UUID => spec.uuid,
+        :GUARDIAN => chunk_string(string(issuer(spec)), 8) |> uppercase
+    ]
 end
 
 
@@ -289,13 +235,18 @@ end
 
 @get "/braidchain/new-proposal" function(req::Request)
 
-    defaults = Dict()
+    # defaults = Dict()
 
-    defaults["TODAY"] = Dates.format(Dates.today(), "dd/mm/yyyy")
-    defaults["TOMORROW"] = Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy")
-    defaults["CURRENT_ANCHOR"] = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger)
+    # defaults["TODAY"] = Dates.format(Dates.today(), "dd/mm/yyyy")
+    # defaults["TOMORROW"] = Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy")
+    # defaults["CURRENT_ANCHOR"] = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger)
 
-    return render(joinpath(TEMPLATES, "new-proposal.html"), defaults) |> html
+    #return render(joinpath(TEMPLATES, "new-proposal.html"), defaults) |> html
+    return render_template("new-proposal.html") <| [
+        :TODAY => Dates.format(Dates.today(), "dd/mm/yyyy"),
+        :TOMORROW => Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy"),
+        :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger)
+    ]
 end
 
 

@@ -72,7 +72,6 @@ end
 
 MemberProfile(name::String, email::String, ticket::TicketID) = MemberProfile(name, email, ticket, Dates.now(), Invited(false))
 
-#@enum MemberState 
 
 struct ElectoralRoll
     ledger::Vector{MemberProfile}
@@ -80,7 +79,7 @@ end
 
 ElectoralRoll() = ElectoralRoll(MemberProfile[])
 
-const ELECTORAL_ROLL = ElectoralRoll()
+global ELECTORAL_ROLL::ElectoralRoll = ElectoralRoll()
 
 
 update!(profile::MemberProfile) = profile.state = get_registration_status(profile.ticketid)
@@ -214,7 +213,11 @@ end
 
     profiles = MemberProfileView[construct_view(i) for i in ELECTORAL_ROLL.ledger]
     
-    return render(joinpath(TEMPLATES, "registrar.html"), Dict("TABLE"=>profiles)) |> html
+    #return render(joinpath(TEMPLATES, "registrar.html"), Dict("TABLE"=>profiles)) |> html
+    
+    return render_template("registrar.html") <| [
+        :TABLE => profiles
+    ]
 end
 
 
@@ -242,8 +245,6 @@ function send(invite::Invite, profile::MemberProfile)
 
     elseif startswith(email, "http://")
         
-        @infiltrate
-
         address = email
 
         HTTP.post(address; body=invite_code)

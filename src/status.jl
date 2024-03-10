@@ -2,14 +2,21 @@
 
 @get "/status" function(req::Request)
 
-    demespec = Mapper.BRAID_CHAIN[][1] # keep it simple
+    #demespec = Mapper.BRAID_CHAIN[][1] # keep it simple
 
-    DATA = Dict{String, String}()
+    demespec = Mapper.get_demespec()
 
-    DATA["UUID"] = string(demespec.uuid)
-    DATA["TITLE"] = demespec.title
+    #DATA = Dict{String, String}()
 
-    return render(joinpath(TEMPLATES, "status.html"), DATA) |> html
+    #DATA["UUID"] = string(demespec.uuid)
+    #DATA["TITLE"] = demespec.title
+
+    #return render(joinpath(TEMPLATES, "status.html"), DATA) |> html
+    render_template("status.html") <| [
+        :UUID => string(demespec.uuid),
+        :TITLE => demespec.title
+    ]
+
 end
 
 

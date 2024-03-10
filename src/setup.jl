@@ -4,6 +4,7 @@ using Oxygen: html, json
 using Gumbo
 using Cascadia
 
+global SETUP_DONE::Bool = false # Consider puttin within settings
 
 function create_deme((; title, email, group, hash, password))
 
@@ -106,28 +107,27 @@ end
 # TODO: update with using authorized_roles function
 @get "/setup-summary" function(req::Request)
 
-    (; uuid, title, crypto, recorder, registrar, braider, proposer, collector) = Mapper.get_demespec() #DEMESPEC_CANDIDATE[]
-
-
-    guardian = issuer(Mapper.get_demespec())
-
-    # Title first
-    tmpl = Mustache.load(joinpath(TEMPLATES, "wizard-step-3.html"))
+    spec = Mapper.get_demespec()
+    (; uuid, title, crypto, recorder, registrar, braider, proposer, collector) = spec
 
     group_name = get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(crypto.group))
     hash_name = get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(crypto.hasher))
-    
-    guardian_pbkey = chunk_string(string(guardian), 8) #|> uppercase
 
-    # For this one I would need to do key maangement manually
     #roles = raw"<b>BraidChain</b>, <s>BallotBox</s>, <b>Registrar</b>, <s>Proposer</s>, <s>Braider</s>"
-
-    # I can use authorized_roles
-
+    # TODO: use authorized_roles
     roles = raw"<b>BraidChain</b>, <b>BallotBox</b>, <b>Registrar</b>, <b>Proposer</b>, <b>Braider</b>"
     commit = "#1"
 
-    return Mustache.render(tmpl; title, uuid, group_name, hash_name, guardian_pbkey, roles, commit) |> html
+    return render_template("wizard-step-3.html") <| [
+        :TITLE => title,
+        :UUID => uuid,
+        :GROUP_NAME => group_name,
+        :HASH_NAME => hash_name,
+        :GUARDIAN => chunk_string(string(issuer(spec)), 8) |> uppercase,
+        :ROLES => roles,
+        :COMMIT => commit,
+        :ISSUE_DATE => format_date_ordinal(spec.seal.timestamp)
+    ]
 end 
 
 

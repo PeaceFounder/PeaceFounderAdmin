@@ -69,7 +69,7 @@
                 <div class="form-group">
                   <label class="form-label">Title</label>
                   <div class="textarea">
-                    {{:title}}
+                    {{TITLE}}
                   </div>
                 </div>
               </div>
@@ -77,7 +77,7 @@
               <div class="form-group">
                 <label class="form-label"><div style="">UUID</div></label>
                 <div class="textarea">
-                  {{:uuid}}
+                  {{UUID}}
                 </div>
               </div>
 
@@ -85,14 +85,14 @@
               <div class="form-group">
                 <label class="form-label"><div style="">Cryptographic Group</div></label>
                 <div class="textarea">
-                  {{:group_name}}
+                  {{GROUP_NAME}}
                 </div>
               </div>
 
               <div class="form-group">
                 <label class="form-label"><div style="">Hash Function</div></label>
                 <div class="textarea">
-                  {{:hash_name}}
+                  {{HASH_NAME}}
                 </div>
               </div>
 
@@ -100,14 +100,14 @@
               <div class="form-group">
                 <label class="form-label">Guardian</label>
                 <div class="textarea">
-                  {{:guardian_pbkey}}
+                  {{GUARDIAN}}
                 </div>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Authorized Roles</label>
                 <div class="textarea">
-                  {{{:roles}}}
+                  {{{ROLES}}}
                 </div>
               </div>
 
@@ -115,7 +115,7 @@
               <div class="form-group">
                 <label class="form-label">Current Commit</label>
                 <div class="textarea">
-                  {{:commit}}
+                  {{COMMIT}}
                 </div>
               </div>
 
@@ -126,7 +126,7 @@
 
         <div class="fieldset-footer">
           <div class="actions clearfix">
-            <span>Signed by Guardian on Jan 1st 2024 at 22:34
+            <span>Signed by Guardian on {{ISSUE_DATE}}
             </span>
             <ul role="menu" aria-label="Pagination">
               <li aria-disabled="true">
