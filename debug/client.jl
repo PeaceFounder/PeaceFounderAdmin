@@ -52,9 +52,6 @@ end
 
 function vote(proposal::Int, member::Int, selection::Selection)
     
-    # find the member
-    # update cache
-    # 
     client = get_client(member)
 
     uuid = get_deme_uuid(client)    
