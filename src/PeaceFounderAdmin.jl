@@ -5,7 +5,9 @@ using Infiltrator
 using PeaceFounder
 using UUIDs
 
-using PeaceFounder.Model: CryptoSpec, pseudonym, TicketID, Membership, Proposal, Ballot, Selection, generator, state, id, vote, seed, tally, approve, istallied, DemeSpec, hasher, HMAC, token, isbinding, Generator, generate, Signer
+using PeaceFounder.Server: Mapper
+using PeaceFounder.Core: Model
+using PeaceFounder.Core.Model: CryptoSpec, pseudonym, TicketID, Membership, Proposal, Ballot, Selection, generator, state, id, seed, tally, approve, istallied, DemeSpec, hasher, isbinding, Generator, generate, Signer
 
 module AdminService using Oxygen; @oxidise end
 import .AdminService: @get, @put, @post, @delete, Request, Response, dynamicfiles
@@ -64,7 +66,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
         SETTINGS.SERVER_ROUTE = server_route
     end
 
-    server_service = PeaceFounder.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
+    server_service = PeaceFounder.Server.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
     admin_service = AdminService.serve(port=admin_port, middleware=[admin_middleware..., SetupMiddleware], async=true)
     
     try 

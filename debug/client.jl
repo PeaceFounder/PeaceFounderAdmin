@@ -1,23 +1,17 @@
-# Need to refactor to use DemeAccount directly
+# I could use DemeAccount directly
 
-#using Infiltrator
 using Oxygen
-#using HTTP: Request
-
-using PeaceFounder: Client, Parser
-using PeaceFounder.Model: Selection
+using PeaceFounder: Client
+using PeaceFounder.Core: Parser
+using PeaceFounder.Core.Model: Selection
 using PeaceFounder.Client: Invite, DemeClient
 
 # Reseting a state here is more burdensome
 isdefined(Main, :Clients) || (CLIENTS = [])
 
 function register(invite::Invite)
-
     client = Client.DemeClient()
     Client.enroll!(client, invite)
-    #(uuid, index) = Client.enroll!(client, invite)
-    #global UUID = uuid # assuming all are the same
-    
     push!(CLIENTS, client)
 end
 
@@ -25,14 +19,11 @@ register(invite::String) = register(PeaceFounder.Parser.unmarshal(invite, Invite
 
 @post "/debug" function(req::Request)
 
-    #@infiltrate
-
     invite = Parser.unmarshal(req.body, Invite)
     register(invite)
 
     return
 end
-
 
 get_index(client::DemeClient) = client.accounts[1].guard.ack.proof.index
 get_deme_uuid(client::DemeClient) = client.accounts[1].deme.uuid

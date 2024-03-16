@@ -1,4 +1,4 @@
-using PeaceFounder.Model: issuer
+using PeaceFounder.Core.Model: issuer
 
 using Oxygen: html, json
 using Gumbo
@@ -110,7 +110,7 @@ end
     spec = Mapper.get_demespec()
     (; uuid, title, crypto, recorder, registrar, braider, proposer, collector) = spec
 
-    group_name = get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(crypto.group))
+    group_name = get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), Model.lower_groupspec(crypto.group))
     hash_name = get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(crypto.hasher))
 
     #roles = raw"<b>BraidChain</b>, <s>BallotBox</s>, <b>Registrar</b>, <s>Proposer</s>, <s>Braider</s>"

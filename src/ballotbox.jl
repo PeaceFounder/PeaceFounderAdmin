@@ -1,3 +1,8 @@
+using Printf
+using PeaceFounder.Core.Model: CastRecord, Proposal, BraidReceipt, Pseudonym, Selection, voters
+using PeaceFounder.Server.Controllers: BallotBox
+using PeaceFounder.StaticSets: findindex
+
 
 struct VoteView
     CAST::Int
@@ -7,10 +12,6 @@ struct VoteView
     SELECTION::String
     STATUS::String
 end
-
-
-using PeaceFounder.Model: CastRecord, Proposal, BraidReceipt, Pseudonym, Selection, BallotBox, voters
-using PeaceFounder.StaticSets: findindex
 
 
 function create_view(bbox::BallotBox)
@@ -61,7 +62,6 @@ end
     ]
 end
 
-using Printf
 
 
 function format_percent(fraction)
@@ -82,9 +82,9 @@ end
 
     # Assumes that only valid pseudonyms have signed the votes, which is true
     # for a record to be inlcuded into ballotbox ledger.
-    tally_bitmask = PeaceFounder.Model.tallyview(bbox.ledger, proposal.ballot)
+    tally_bitmask = Model.tallyview(bbox.ledger, proposal.ballot)
     
-    _tally = tally(proposal.ballot, PeaceFounder.Model.selections(bbox.ledger[tally_bitmask]))
+    _tally = tally(proposal.ballot, Model.selections(bbox.ledger[tally_bitmask]))
 
     lines = ""
 
@@ -95,7 +95,7 @@ end
     end
 
     if isnothing(bbox.commit.state.tally)
-        releses = "Scheduled on " * Dates.format(proposal.closed, "d u yyyy, HH:MM")
+        releases = "Scheduled on " * Dates.format(proposal.closed, "d u yyyy, HH:MM")
     else
         releases = """Released on <span id="under-construction">6 Jan 2024, 23:00</span>"""
     end

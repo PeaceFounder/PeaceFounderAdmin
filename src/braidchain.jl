@@ -1,4 +1,5 @@
-# braidchain
+using PeaceFounder.Core.Model: Transaction, DemeSpec, Membership, BraidReceipt, Proposal, generator, root, members, ChainState
+using PeaceFounder.Server.Controllers: BraidChain
 
 
 struct RecordView
@@ -11,8 +12,6 @@ end
 
 RecordView(index, type, timestamp, issuer) = RecordView(index, type, timestamp, issuer, lowercase(type))
 
-
-using PeaceFounder.Model: Transaction, DemeSpec, Membership, BraidReceipt, Proposal
 
 function row_view(record::Transaction, i::Int)
 
@@ -92,7 +91,7 @@ end
         :INDEX => index,
         :TITLE => spec.title,
         :UUID => string(spec.uuid),
-        :GROUP_NAME => get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), PeaceFounder.Model.lower_groupspec(spec.crypto.group)),
+        :GROUP_NAME => get_option_text(joinpath(TEMPLATES, "partials/group_specs.html"), Model.lower_groupspec(spec.crypto.group)),
         :HASH_NAME => get_option_text(joinpath(TEMPLATES, "partials/hash_specs.html"), string(spec.crypto.hasher)),
         :HASHER => string(spec.crypto.hasher),
         :GENERATOR => chunk_string(string(spec.crypto.generator), 8) |> uppercase,
@@ -250,7 +249,7 @@ end
 end
 
 
-using PeaceFounder.Model: generator, root, members, ChainState, BraidChain
+
 
 
 function _state(chain::BraidChain, index::Int)

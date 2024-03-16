@@ -4,8 +4,9 @@ using Dates
 using UUIDs
 
 using PeaceFounder
-using PeaceFounder: Client, Mapper
-using PeaceFounder.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection
+using PeaceFounder: Client
+using PeaceFounder.Server: Mapper, Service
+using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid
 
 
 
@@ -60,17 +61,17 @@ function init_test_state()
 
 
     profile = PeaceFounderAdmin.create_profile("Lisbeth Salander", "DEBUG")
-    invite = PeaceFounder.Mapper.enlist_ticket(profile.ticketid)
+    invite = Mapper.enlist_ticket(profile.ticketid)
     lisbeth = Client.DemeClient()
     Client.enroll!(lisbeth, invite, key = 4)
 
     profile = PeaceFounderAdmin.create_profile("Dorian Gray", "DEBUG")
-    invite = PeaceFounder.Mapper.enlist_ticket(profile.ticketid)
+    invite = Mapper.enlist_ticket(profile.ticketid)
     dorian = Client.DemeClient()
     Client.enroll!(dorian, invite, key = 3)
     
     profile = PeaceFounderAdmin.create_profile("Winston Smith", "DEBUG") #Holly Golightly
-    invite = PeaceFounder.Mapper.enlist_ticket(profile.ticketid)
+    invite = Mapper.enlist_ticket(profile.ticketid)
     winston = Client.DemeClient() 
     Client.enroll!(winston, invite, key = 5) # need to look into key attribute a
     # Also randomness in ShuffleProofs seems to be fixated during compilation time and thus need to be improved.
@@ -80,7 +81,7 @@ function init_test_state()
     input_generator = Mapper.get_generator()
     input_members = Mapper.get_members()
 
-    braidreceipt = Model.braid(input_generator, input_members, demespec, demespec, Mapper.BRAIDER[]) 
+    braidreceipt = braid(input_generator, input_members, demespec, demespec, Mapper.BRAIDER[]) 
 
     Mapper.submit_chain_record!(braidreceipt)
 

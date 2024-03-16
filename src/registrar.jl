@@ -1,8 +1,9 @@
 import HTTP
 using Dates
 
-import PeaceFounder.Model: Registrar, Digest, Ticket, token, hmac
-import PeaceFounder.Client: Invite
+import PeaceFounder.Core: Parser, ProtocolSchema
+import PeaceFounder.Core.Model: Digest 
+import PeaceFounder.Core.ProtocolSchema: Invite
 using URIs
 
 
@@ -43,13 +44,13 @@ end
 
 function get_registration_status(ticketid::TicketID)
 
-    admission_state = PeaceFounder.Model.isadmitted(ticketid, PeaceFounder.Mapper.REGISTRAR[])
+    admission_state = ProtocolSchema.isadmitted(ticketid, Mapper.REGISTRAR[])
 
     if !admission_state
         return Invited(false)
     end
 
-    registration_index = get_registration_index(PeaceFounder.Mapper.BRAID_CHAIN[], ticketid)
+    registration_index = get_registration_index(Mapper.BRAID_CHAIN[], ticketid)
 
     if isnothing(registration_index)
         return Admitted(false)
@@ -225,7 +226,7 @@ function send(invite::Invite, profile::MemberProfile)
 
     (; name, email) = profile
 
-    invite_code = String(PeaceFounder.Parser.marshal(invite))
+    invite_code = String(Parser.marshal(invite))
 
     spec = Mapper.get_demespec()
 
