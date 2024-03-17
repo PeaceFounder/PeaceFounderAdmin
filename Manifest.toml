@@ -363,7 +363,7 @@ version = "2.8.1"
 
 [[deps.PeaceFounder]]
 deps = ["Base64", "CryptoGroups", "CryptoSignatures", "Dates", "DocStringExtensions", "HTTP", "HistoryTrees", "Infiltrator", "JSON3", "Nettle", "Oxygen", "Random", "Setfield", "ShuffleProofs", "Sockets", "StructEquality", "StructHelpers", "StructTypes", "SwaggerMarkdown", "Test", "URIs"]
-git-tree-sha1 = "187a25257f70625d419529cfdde2f7cac29e53fb"
+git-tree-sha1 = "98ed13ca4045f7ca42865defc4a801a60dd05136"
 repo-rev = "master"
 repo-url = "https://github.com/PeaceFounder/PeaceFounder.jl"
 uuid = "916f7771-afe2-4319-943d-0e770c333432"

@@ -1,6 +1,6 @@
 using Printf
 using PeaceFounder.Core.Model: CastRecord, Proposal, BraidReceipt, Pseudonym, Selection, voters
-using PeaceFounder.Server.Controllers: BallotBox
+using PeaceFounder.Server.Controllers: BallotBoxController
 using PeaceFounder.StaticSets: findindex
 
 
@@ -14,7 +14,7 @@ struct VoteView
 end
 
 
-function create_view(bbox::BallotBox)
+function create_view(bbox::BallotBoxController)
 
     pseudonyms = voters(bbox)
     table = VoteView[]
@@ -28,9 +28,9 @@ function create_view(bbox::BallotBox)
         seq = v.vote.seq
 
         selection = string(v.vote.selection.option)
-        next_vote = findnext(x -> x.vote.seal.pbkey == v.vote.seal.pbkey && x.vote.seq >= v.vote.seq, bbox.ledger, cast + 1)
+        next_vote = findnext(x -> x.vote.seal.pbkey == v.vote.seal.pbkey && x.vote.seq >= v.vote.seq, bbox.ledger.records, cast + 1)
 
-        if Model.isconsistent(v.vote.selection, bbox.proposal.ballot)
+        if Model.isconsistent(v.vote.selection, bbox.ledger.proposal.ballot)
 
             if isnothing(next_vote)
                 status = """<span class="fw-bold text-success">Valid</span>"""
@@ -82,9 +82,11 @@ end
 
     # Assumes that only valid pseudonyms have signed the votes, which is true
     # for a record to be inlcuded into ballotbox ledger.
-    tally_bitmask = Model.tallyview(bbox.ledger, proposal.ballot)
+    #tally_bitmask = Model.tallyview(bbox.ledger, proposal.ballot)
+    tally_bitmask = Model.tallyview(bbox.ledger)
     
-    _tally = tally(proposal.ballot, Model.selections(bbox.ledger[tally_bitmask]))
+    #_tally = tally(proposal.ballot, Model.selections(bbox.ledger[tally_bitmask]))
+    _tally = tally(bbox.ledger)
 
     lines = ""
 

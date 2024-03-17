@@ -1,5 +1,5 @@
 using PeaceFounder.Core.Model: Transaction, DemeSpec, Membership, BraidReceipt, Proposal, generator, root, members, ChainState
-using PeaceFounder.Server.Controllers: BraidChain
+using PeaceFounder.Server.Controllers: BraidChainController
 
 
 struct RecordView
@@ -112,7 +112,7 @@ end
 
     return render_template("member.html") <| [
         :INDEX => index,
-        :GENERATOR => findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1),
+        :GENERATOR => findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger.records, index - 1),
         :TICKETID => chunk_string(string(record.admission.ticketid), 8) |> uppercase,
         :IDENTITY => chunk_string(string(record.admission.id), 8) |> uppercase,
         :ISSUE_TIMESTAMP => Dates.format(record.admission.seal.timestamp, "d u yyyy, HH:MM"),
@@ -129,7 +129,7 @@ end
 
 @get "/braidchain/{index}/braid" function(req::Request, index::Int)
     
-    input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger, index - 1)
+    input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger.records, index - 1)
 
     braid = Mapper.BRAID_CHAIN[].ledger[index]
 
@@ -244,15 +244,12 @@ end
     return render_template("new-proposal.html") <| [
         :TODAY => Dates.format(Dates.today(), "dd/mm/yyyy"),
         :TOMORROW => Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy"),
-        :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger)
+        :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger.records)
     ]
 end
 
 
-
-
-
-function _state(chain::BraidChain, index::Int)
+function _state(chain::BraidChainController, index::Int)
 
     g = generator(chain, index)
     r = root(chain, index)
@@ -276,7 +273,7 @@ end
 
 
     if isempty(anchor)
-        anchor_index = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger)
+        anchor_index = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger.records)
     else
         if anchor[1] == "#"
             anchor_index = parse(Int, anchor[2:end])
