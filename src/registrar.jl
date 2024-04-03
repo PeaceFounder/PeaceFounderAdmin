@@ -1,6 +1,9 @@
 import HTTP
 using Dates
 
+using JSON3 
+using StructTypes
+
 import PeaceFounder.Core: Parser, ProtocolSchema
 import PeaceFounder.Core.Model: Digest 
 import PeaceFounder.Core.ProtocolSchema: Invite
@@ -20,7 +23,6 @@ end
 
 struct Registered <: MemberState
     registered::Int
-    #index::Int
     verified::Bool
 end
 
@@ -28,6 +30,8 @@ struct Terminated <: MemberState
     registered::Int
     terminated::Int
 end
+
+
 
 
 function get_registration_index(chain, ticketid::TicketID)
@@ -44,18 +48,32 @@ end
 
 function get_registration_status(ticketid::TicketID)
 
-    admission_state = ProtocolSchema.isadmitted(ticketid, Mapper.REGISTRAR[])
-
-    if !admission_state
-        return Invited(false)
-    end
-
     registration_index = get_registration_index(Mapper.BRAID_CHAIN[], ticketid)
 
     if isnothing(registration_index)
-        return Admitted(false)
+
+        try
+
+            admission_state = ProtocolSchema.isadmitted(ticketid, Mapper.REGISTRAR[]) # arguments could be reverse
+            
+            if !admission_state
+                return Invited(false)
+            else
+                return Admitted(false)
+            end
+
+        catch
+            
+            # it is uknonw at this point whether client already had obtained an admission
+            # the safest option is to say it is expired. In case ticket is renewed and dublicate 
+            # admission is issued we rely on braidchain to drop memebership registrations with the same ticketid
+            
+            return Invited(true) 
+        end
     end
 
+    # To check if profile is verified we need to go through ElectoralRoll and check attribute for the profile 
+    
     # One could proceed looking termination transaction in future
     return Registered(registration_index, false)
 end
@@ -64,35 +82,91 @@ end
 mutable struct MemberProfile
     name::String
     email::String
-    ticketid::TicketID
+    ticketid::TicketID # I could consider moving TicketID -> UUID; TicketID though is more versatile as it can encode information.
     created::DateTime # 
-    state::MemberState
-    #index::Union{Int, Nothing}
-    #termination::Union{Int, Nothing} # Refers to braidchain
 end
 
-MemberProfile(name::String, email::String, ticket::TicketID) = MemberProfile(name, email, ticket, Dates.now(), Invited(false))
+MemberProfile(name::String, email::String, ticket::TicketID) = MemberProfile(name, email, ticket, Dates.now())
 
+StructTypes.StructType(::Type{MemberProfile}) = StructTypes.Struct()
+
+Base.isless(x::MemberProfile, y::MemberProfile) = isless(x.created, y.created)
 
 struct ElectoralRoll
     ledger::Vector{MemberProfile}
 end
 
+Base.push!(roll::ElectoralRoll, profile::MemberProfile) = push!(roll.ledger, profile)
+Base.sort!(roll::ElectoralRoll) = sort!(roll.ledger)
+
 ElectoralRoll() = ElectoralRoll(MemberProfile[])
 
-global ELECTORAL_ROLL::ElectoralRoll = ElectoralRoll()
+
+ELECTORAL_ROLL::ElectoralRoll = ElectoralRoll()
+REGISTRAR_PATH::String = ""
 
 
-update!(profile::MemberProfile) = profile.state = get_registration_status(profile.ticketid)
+function store(profile::MemberProfile, path::String)
+    mkpath(dirname(path))
+    open(path, "w") do file
+        JSON3.write(file, profile)
+    end
+end
 
-function update!(roll::ElectoralRoll)
+function load(::Type{MemberProfile}, path::String)
+    return open(path, "r") do file
+        return JSON3.read(file, MemberProfile)
+    end
+end
 
+function store(roll::ElectoralRoll, dir::String)
     for profile in roll.ledger
-        try
-            update!(profile) 
-        catch
-            @warn "$(profile.name) can't be updated"
-        end
+        ticketid = string(profile.ticketid)
+        mkpath(joinpath(dir, ticketid))
+        store(profile, joinpath(dir, ticketid, "metadata.json"))
+    end
+end
+
+function load(::Type{ElectoralRoll}, dir::String)
+
+    roll = ElectoralRoll()
+
+    isdir(dir) || return roll # return empty collection if directory does not exist
+
+    for profile_path in readdir(dir)
+        profile = load(MemberProfile, joinpath(dir, profile_path, "metadata.json"))
+        push!(roll, profile)
+    end
+    
+    sort!(roll)
+
+    return roll
+end
+
+function store(profile::MemberProfile)
+    isempty(REGISTRAR_PATH) && return
+    store(profile, joinpath(REGISTRAR_PATH, "records", string(profile.ticketid), "metadata.json"))
+end
+
+load(::Type{MemberProfile}, ticketid::TicketID) = load(MemberProfile, joinpath(REGISTRAR_PATH, "records", string(ticketid), "metadata.json"))
+
+
+function evict(ticketid::TicketID)
+
+    roll_index = findfirst(x -> x.ticketid == ticketid, ELECTORAL_ROLL.ledger)
+    deleteat!(ELECTORAL_ROLL.ledger, roll_index)
+
+    try
+        Mapper.delete_ticket(ticketid)
+    catch
+        @warn "If admission is issued bur member is only about to register then it will be orphaned. The record will be moved in `registrar/evictees` if needed for recovery."
+    end
+    
+    if !isempty(REGISTRAR_PATH) && isdir(joinpath(REGISTRAR_PATH, "records", string(ticketid)))
+
+        mkpath(joinpath(REGISTRAR_PATH, "evictees"))
+        mv(joinpath(REGISTRAR_PATH, "records", string(ticketid)), joinpath(REGISTRAR_PATH, "evictees", string(ticketid)))
+
     end
 
     return
@@ -116,7 +190,8 @@ function create_profile(name::String, email::String)
     ticketid = TicketID(rand(UInt8, 16))
     member = MemberProfile(name, email, ticketid)
 
-    push!(ELECTORAL_ROLL.ledger, member)
+    push!(ELECTORAL_ROLL, member)
+    store(member)
 
     return member
 end
@@ -135,8 +210,6 @@ end
 
 
 
-
-
 struct MemberProfileView
     TICKETID::String # This is good to have for intermediate actions, I could also try TicketID
     NAME::String
@@ -147,9 +220,9 @@ struct MemberProfileView
 end
 
 
-function construct_view(profile::MemberProfile)
+function construct_view(profile::MemberProfile, state::MemberState = get_registration_status(profile.ticketid))
 
-    (; name, email, ticketid, created, state) = profile
+    (; name, email, ticketid, created) = profile
 
     NAME = name
     EMAIL = email
@@ -208,9 +281,11 @@ function construct_view(profile::MemberProfile)
     return MemberProfileView(TICKETID, NAME, EMAIL, TIMESTAMP, REGISTRATION, STATUS)
 end
 
+
+
 @get "/registrar" function(req::Request)
 
-    update!(ELECTORAL_ROLL)
+    #update!(ELECTORAL_ROLL)
 
     profiles = MemberProfileView[construct_view(i) for i in ELECTORAL_ROLL.ledger]
     
@@ -276,12 +351,8 @@ end
 @delete "/registrar/{tid}" function(req::Request, tid::String)
 
     ticketid = TicketID(hex2bytes(tid))
-
-    Mapper.delete_ticket(ticketid)
-
-    roll_index = findfirst(x -> x.ticketid == ticketid, ELECTORAL_ROLL.ledger)
-    deleteat!(ELECTORAL_ROLL.ledger, roll_index)
-
+    evict(ticketid)
+    
     return Response(301, Dict("Location" => "/registrar"))
 end
 

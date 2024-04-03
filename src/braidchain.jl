@@ -35,12 +35,6 @@ end
 
 function row_view(record::Membership, i::Int)
 
-    # MembershipCertificate is mor suitable than MemberPass
-    # - More ceremonial and used for display or record-keeping. This is true as it is not directly used.
-    # - Includes the member's name, date of issue, possibly the signatures of officials from the organization. Signatures are essential.
-    # - Often issued once upon the initiation of membership and may not require renewal. It's more of a permanent record.
-
-
     type = "Membership"
     timestamp = Dates.format(record.admission.seal.timestamp, "d u yyyy, HH:MM")
     issuer = """<td><span class="fw-normal">#1.Registrar</span></td>"""
@@ -201,13 +195,6 @@ end
 
     spec = Mapper.get_demespec()
 
-    # data = Dict()
-
-    # data["TITLE"] = spec.title
-    # data["UUID"] = spec.uuid
-    # data["GUARDIAN"] = chunk_string(string(issuer(spec)), 8) |> uppercase
-
-    #return render(joinpath(TEMPLATES, "new-braid.html"), data) |> html
     return render_template("new-braid.html") <| [
         :TITLE => spec.title,
         :UUID => spec.uuid,
@@ -223,7 +210,7 @@ end
     input_generator = Mapper.get_generator()
     input_members = Mapper.get_members()
 
-    braidwork = Model.braid(input_generator, input_members, spec, spec, Mapper.BRAIDER[]) 
+    braidwork = Model.braid(input_generator, input_members, spec.crypto, spec, Mapper.BRAIDER[]) 
 
     Mapper.submit_chain_record!(braidwork)
 
@@ -234,32 +221,12 @@ end
 
 @get "/braidchain/new-proposal" function(req::Request)
 
-    # defaults = Dict()
-
-    # defaults["TODAY"] = Dates.format(Dates.today(), "dd/mm/yyyy")
-    # defaults["TOMORROW"] = Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy")
-    # defaults["CURRENT_ANCHOR"] = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger)
-
-    #return render(joinpath(TEMPLATES, "new-proposal.html"), defaults) |> html
     return render_template("new-proposal.html") <| [
         :TODAY => Dates.format(Dates.today(), "dd/mm/yyyy"),
         :TOMORROW => Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy"),
         :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger.records)
     ]
 end
-
-
-function _state(chain::BraidChainController, index::Int)
-
-    g = generator(chain, index)
-    r = root(chain, index)
-    member_count = length(members(chain, index))
-
-    return ChainState(index, r, g, member_count)
-end
-
-
-
 
 @post "/braidchain/new-proposal" function(req::Request)
 
@@ -283,7 +250,7 @@ end
     end
 
     # I need to retrieve a state of the braidchain
-    anchor_state = _state(Mapper.BRAID_CHAIN[], anchor_index)
+    anchor_state = Model.state(Mapper.BRAID_CHAIN[], anchor_index)
 
     open_datetime = DateTime(join([open_date, open_time], " "), "dd/mm/yyyy HH:MM")
     close_datetime = DateTime(join([close_date, close_time], " "), "dd/mm/yyyy HH:MM")

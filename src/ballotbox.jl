@@ -54,7 +54,7 @@ end
 @get "/braidchain/{index}/ballotbox" function(req::Request, index::Int)
     
     proposal = Mapper.BRAID_CHAIN[].ledger[index]
-    bbox = Mapper.ballotbox(proposal.uuid)
+    bbox = Mapper.get_ballotbox(proposal.uuid)
 
     return render_template("proposal_ballotbox.html") <| [
         :INDEX => index,
@@ -78,12 +78,12 @@ end
 @get "/braidchain/{index}/tally" function(req::Request, index::Int)
 
     proposal = Mapper.BRAID_CHAIN[].ledger[index]
-    bbox = Mapper.ballotbox(proposal.uuid)
+    bbox = Mapper.get_ballotbox(proposal.uuid)
 
     # Assumes that only valid pseudonyms have signed the votes, which is true
     # for a record to be inlcuded into ballotbox ledger.
     #tally_bitmask = Model.tallyview(bbox.ledger, proposal.ballot)
-    tally_bitmask = Model.tallyview(bbox.ledger)
+    tally_bitmask = Model.tally_bitmask(bbox.ledger)
     
     #_tally = tally(proposal.ballot, Model.selections(bbox.ledger[tally_bitmask]))
     _tally = tally(bbox.ledger)

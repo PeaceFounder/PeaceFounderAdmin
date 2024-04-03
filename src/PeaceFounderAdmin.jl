@@ -60,10 +60,44 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
 
     # This is the stage where the server may read out user ssettings to read out files
 
-    if isnothing(server_route)
-        SETTINGS.SERVER_ROUTE = "http://$server_host:$server_port"
+    if haskey(ENV, "USER_DATA") && !isempty(ENV["USER_DATA"])
+
+        Mapper.DATA_DIR = ENV["USER_DATA"]
+        SETTINGS.PATH = joinpath(ENV["USER_DATA"], "Settings.toml")
+        global REGISTRAR_PATH = joinpath(ENV["USER_DATA"], "private", "registrar")
+                
+        @info """User data set to $(ENV["USER_DATA"])"""
+
+        if isempty(readdir(ENV["USER_DATA"]))
+            @info "Starting fresh with setup"
+        else
+            try 
+                Mapper.load_system()
+                global SETUP_DONE = true
+                @info "System is succesfully reinitialized from previous state"
+            catch err
+                @error "Initialization from previous state has failed. Use `Mapper.load_system()` to investigate."
+                throw(err)
+            end
+
+            global ELECTORAL_ROLL = load(ElectoralRoll, joinpath(REGISTRAR_PATH, "records"))
+
+            try
+                SETTINGS.load()
+                @info "Settings are loaded"
+            catch err
+                @warn "Could not load previous settings. Preceeding with defaults."
+                throw(err)
+            end
+        end
     else
+        Mapper.DATA_DIR = ""
+    end
+
+    if !isnothing(server_route)
         SETTINGS.SERVER_ROUTE = server_route
+    elseif isempty(SETTINGS.SERVER_ROUTE)
+        SETTINGS.SERVER_ROUTE = "http://$server_host:$server_port"
     end
 
     server_service = PeaceFounder.Server.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
@@ -72,6 +106,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
     try 
         
         mock()
+        SETTINGS.store()
         wait(admin_service)
 
     finally

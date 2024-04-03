@@ -1,39 +1,11 @@
 using PeaceFounder.Core.Model: issuer
+using PeaceFounder.Core: Parser
 
 using Oxygen: html, json
 using Gumbo
 using Cascadia
 
 global SETUP_DONE::Bool = false # Consider puttin within settings
-
-function create_deme((; title, email, group, hash, password))
-
-    @warn "Guardian private key encryption unimplemented and won't be stored"
-
-    crypto = CryptoSpec(hash, group)
-    guardian = generate(Signer, crypto)
-
-    authorized_roles = Mapper.setup(crypto.group, crypto.generator) do pbkeys
-
-        # A BRAID_CHAIN can be populated with records here
-
-        return DemeSpec(;
-                        uuid = Base.UUID(rand(UInt128)),
-                        title = title,
-                        email = email,
-                        crypto = crypto,
-                        recorder = pbkeys[1],
-                        registrar = pbkeys[2],
-                        braider = pbkeys[3],
-                        proposer = pbkeys[4],
-                        collector = pbkeys[5]
-                        ) |> approve(guardian) 
-
-    end
-
-    return
-end
-
 
 # This is in fact the only method I need
 function get_option_text(fname, value)
@@ -68,16 +40,29 @@ end
 end
 
 
+function save_guardian_key(signer::Signer, password::String)
+
+    isempty(Mapper.DATA_DIR) && return
+
+    plaintext = Parser.marshal(signer)
+    ciphertext = openssl_encrypt(plaintext, password)
+    mkpath(joinpath(Mapper.DATA_DIR, "secret"))
+
+    write(joinpath(Mapper.DATA_DIR, "secret", "guardian.json.enc"), ciphertext)
+
+    return
+end
+
+
 @post "/configurator" function(req::Request)
     
 
     (; title, email, group, hash, password) = json(req)
 
-    @warn "Guardian private key encryption unimplemented and won't be stored"
-
     # group and hash needs to come in here
     crypto = CryptoSpec(hash, group)
     guardian = generate(Signer, crypto)
+    save_guardian_key(guardian, password)
 
     authorized_roles = Mapper.setup(crypto.group, crypto.generator) do pbkeys
 
@@ -96,7 +81,6 @@ end
                         ) |> approve(guardian) 
 
     end
-
 
     Mapper.set_route(SETTINGS.SERVER_ROUTE)
 

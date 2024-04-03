@@ -9,6 +9,10 @@ using PeaceFounder.Server: Mapper, Service
 using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid
 
 
+ENV["USER_DATA"] = joinpath(tempdir(), "peacefounderadmin")
+#rm(ENV["USER_DATA"], force=true, recursive=true)
+#mkdir(ENV["USER_DATA"])
+
 
 # For testing purposes
 function init_test_state()
@@ -39,7 +43,6 @@ function init_test_state()
 
     proposer = Mapper.PROPOSER[]
     demespec = Mapper.get_demespec() #Mapper.BRAID_CHAIN[].spec
-
 
     PeaceFounderAdmin.SETTINGS.SMTP_EMAIL = "demeregistrar@inbox.lv"
     PeaceFounderAdmin.SETTINGS.SMTP_SERVER = "smtps://mail.inbox.lv:465"
@@ -81,7 +84,7 @@ function init_test_state()
     input_generator = Mapper.get_generator()
     input_members = Mapper.get_members()
 
-    braidreceipt = braid(input_generator, input_members, demespec, demespec, Mapper.BRAIDER[]) 
+    braidreceipt = braid(input_generator, input_members, demespec.crypto, demespec, Mapper.BRAIDER[]) 
 
     Mapper.submit_chain_record!(braidreceipt)
 
@@ -135,7 +138,9 @@ end
 
 PeaceFounderAdmin.serve(server_middleware=[ReviseHandler], admin_middleware=[ReviseHandler]) do
 
-    init_test_state()
+    if isempty(readdir(ENV["USER_DATA"]))
+        init_test_state()
+    end
 
 end
 

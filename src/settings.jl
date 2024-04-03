@@ -3,14 +3,16 @@ import SMTPClient
 
 module SETTINGS
 
-SERVER_ROUTE::String = ""
+using TOML
+
+PATH::String = ""
 
 SMTP_EMAIL::String = "" 
 SMTP_PASSWORD::String = ""
-SMTP_SERVER::String = "" # I did put a placeholder
+SMTP_SERVER::String = "" 
 
-#INVITE_DEME_ADDRESS = ""
-INVITE_SUBJECT::String = "Membership Invite to Deme" # I could use {{DEME}}
+SERVER_ROUTE::String = ""
+INVITE_SUBJECT::String = "Membership Invite to Deme" # We could use {{DEME}}
 INVITE_TEXT::String = """
 
 Dear {{{NAME}}},
@@ -32,12 +34,13 @@ Guardian
 # however may benefit for providing a granular handles
 @eval function reset()
 
-    global SERVER_ROUTE = $SERVER_ROUTE
+    global PATH = $PATH
 
     global SMTP_EMAIL = $SMTP_EMAIL
     global SMTP_PASSWORD = $SMTP_PASSWORD
     global SMTP_SERVER = $SMTP_SERVER
 
+    global SERVER_ROUTE = $SERVER_ROUTE
     global INVITE_SUBJECT = $INVITE_SUBJECT
     global INVITE_TEXT = $INVITE_TEXT
     
@@ -47,8 +50,52 @@ end
 
 hassmtp() = !isempty(SMTP_EMAIL) && !isempty(SMTP_SERVER) && !isempty(SMTP_PASSWORD)
 
+
+function load()
+
+    settings_dict = TOML.parsefile(PATH)
+
+    # TODO: use subcategories with TOML and thus lowecase fields
+
+    # smtp
+    haskey(settings_dict, "SMTP_EMAIL") && (global SMTP_EMAIL = settings_dict["SMTP_EMAIL"])
+    haskey(settings_dict, "SMTP_SERVER") && (global SMTP_SERVER = settings_dict["SMTP_SERVER"])
+    haskey(settings_dict, "SMTP_PASSWORD") && (global SMTP_PASSWORD = settings_dict["SMTP_PASSWORD"])
+
+    # invite
+    haskey(settings_dict, "SERVER_ROUTE") && (global SERVER_ROUTE = settings_dict["SERVER_ROUTE"])
+    haskey(settings_dict, "INVITE_SUBJECT") && (global INVITE_SUBJECT = settings_dict["INVITE_SUBJECT"])
+    haskey(settings_dict, "INVITE_TEXT") && (global INVITE_TEXT = settings_dict["INVITE_TEXT"])
+    
+    return
 end
 
+
+function store()
+
+    isempty(PATH) && return
+
+    settings_dict = Dict{String, Any}()
+
+    settings_dict["SMTP_EMAIL"] = SMTP_EMAIL
+    settings_dict["SMTP_SERVER"] = SMTP_SERVER
+    settings_dict["SMTP_PASSWORD"] = SMTP_PASSWORD
+
+    settings_dict["SERVER_ROUTE"] = SERVER_ROUTE
+    settings_dict["INVITE_SUBJECT"] = INVITE_SUBJECT
+    settings_dict["INVITE_TEXT"] = INVITE_TEXT
+
+    open(PATH, "w") do io
+           TOML.print(io, settings_dict)
+    end
+
+    return
+end
+
+
+end
+
+#const SETTINGS = __SETTINGS.HANDLER
 
 
 @get "/settings" function(req::Request)
@@ -87,6 +134,8 @@ end
     SETTINGS.SMTP_PASSWORD = password # One can spend quite a time to get this working
     SETTINGS.SMTP_SERVER = server
 
+    SETTINGS.store()
+
     return 
 end
 
@@ -98,6 +147,8 @@ end
     SETTINGS.SERVER_ROUTE = address
     SETTINGS.INVITE_SUBJECT = subject
     SETTINGS.INVITE_TEXT = text
+
+    SETTINGS.store()
 
     return
 end
