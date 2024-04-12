@@ -24,7 +24,7 @@ include("registrar.jl")
 include("braidchain.jl")
 include("ballotbox.jl")
 include("status.jl")
-
+include("gitsync.jl")
 
 # TODO: Add a setup middleware layer to isolate from the admin panel unless setup is done
 @get "/" function(req::Request)
@@ -92,7 +92,10 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
         end
     else
         Mapper.DATA_DIR = ""
+        SETTINGS.PATH = ""
     end
+
+    # SETTINGS.PATH
 
     if !isnothing(server_route)
         SETTINGS.SERVER_ROUTE = server_route
@@ -113,7 +116,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
 
         close(server_service)
         close(admin_service)
-        SETTINGS.reset() 
+        #SETTINGS.reset() 
         global SETUP_DONE = false
         global ELECTORAL_ROLL = ElectoralRoll()
     end

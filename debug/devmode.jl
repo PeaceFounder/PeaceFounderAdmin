@@ -10,8 +10,8 @@ using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, appro
 
 
 ENV["USER_DATA"] = joinpath(tempdir(), "peacefounderadmin")
-#rm(ENV["USER_DATA"], force=true, recursive=true)
-#mkdir(ENV["USER_DATA"])
+rm(ENV["USER_DATA"], force=true, recursive=true)
+mkdir(ENV["USER_DATA"])
 
 
 # For testing purposes
@@ -63,17 +63,17 @@ function init_test_state()
     PeaceFounderAdmin.SETUP_DONE = true
 
 
-    profile = PeaceFounderAdmin.create_profile("Lisbeth Salander", "DEBUG")
+    profile = PeaceFounderAdmin.create_profile("Alice", "DEBUG")
     invite = Mapper.enlist_ticket(profile.ticketid)
     lisbeth = Client.DemeClient()
     Client.enroll!(lisbeth, invite, key = 4)
 
-    profile = PeaceFounderAdmin.create_profile("Dorian Gray", "DEBUG")
+    profile = PeaceFounderAdmin.create_profile("Bob", "DEBUG")
     invite = Mapper.enlist_ticket(profile.ticketid)
     dorian = Client.DemeClient()
     Client.enroll!(dorian, invite, key = 3)
     
-    profile = PeaceFounderAdmin.create_profile("Winston Smith", "DEBUG") #Holly Golightly
+    profile = PeaceFounderAdmin.create_profile("Eve", "DEBUG") #Holly Golightly
     invite = Mapper.enlist_ticket(profile.ticketid)
     winston = Client.DemeClient() 
     Client.enroll!(winston, invite, key = 5) # need to look into key attribute a

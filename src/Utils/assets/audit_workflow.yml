@@ -1,0 +1,22 @@
+name: PeaceFounder BuletinBoard Audit
+
+on: [push, pull_request]
+
+jobs:
+  setup-and-run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '1.x'
+
+    - name: Install PeaceFounder from GitHub
+      run: |
+        julia -e 'using Pkg; Pkg.add(url="https://github.com/PeaceFounder/PeaceFounder.jl")'
+
+    - name: Execute PeaceFounder Audit
+      run: |
+        julia --project=. --eval "joinpath(dirname(dirname(Base.find_package(\"PeaceFounder\"))), \"bin\", \"audit.jl\") |> include" all --verbose .

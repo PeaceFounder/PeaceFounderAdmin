@@ -2,7 +2,7 @@
 
 julia_version = "1.10.2"
 manifest_format = "2.0"
-project_hash = "51e573e7e08d8da9bfcb7ab102dffaf2737fac6a"
+project_hash = "35363322924cc3f623d15e44da3019f2943fbb2a"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -136,6 +136,12 @@ git-tree-sha1 = "dcb08a0d93ec0b1cdc4af184b26b591e9695423a"
 uuid = "460bff9d-24e4-43bc-9d9f-a8973cb893f4"
 version = "0.1.10"
 
+[[deps.Expat_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "4558ab818dcceaab612d1bb8c19cee87eda2b83c"
+uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
+version = "2.5.0+0"
+
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
@@ -147,6 +153,18 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 deps = ["Artifacts", "Libdl"]
 uuid = "781609d7-10c4-51f6-84f2-b8444358ff6d"
 version = "6.2.1+6"
+
+[[deps.Git]]
+deps = ["Git_jll"]
+git-tree-sha1 = "04eff47b1354d702c3a85e8ab23d539bb7d5957e"
+uuid = "d7ba0133-e1db-5d97-8f8c-041e4b3a1eb2"
+version = "1.3.1"
+
+[[deps.Git_jll]]
+deps = ["Artifacts", "Expat_jll", "JLLWrappers", "LibCURL_jll", "Libdl", "Libiconv_jll", "OpenSSL_jll", "PCRE2_jll", "Zlib_jll"]
+git-tree-sha1 = "d18fb8a1f3609361ebda9bf029b60fd0f120c809"
+uuid = "f8c6e375-362e-5223-8a59-34ff63f689eb"
+version = "2.44.0+2"
 
 [[deps.Gumbo]]
 deps = ["AbstractTrees", "Gumbo_jll", "Libdl"]
@@ -173,9 +191,9 @@ version = "0.2.0"
 
 [[deps.Infiltrator]]
 deps = ["InteractiveUtils", "Markdown", "REPL", "UUIDs"]
-git-tree-sha1 = "838a8df6dd9ce18565fac062f6346b0a1fca5609"
+git-tree-sha1 = "199dbd38ff8c03d694f73cdc605b1208e553f7e8"
 uuid = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
-version = "1.7.0"
+version = "1.8.0"
 
 [[deps.IntegerMathUtils]]
 git-tree-sha1 = "b8ffb903da9f7b8cf695a8bead8e01814aa24b30"
@@ -327,6 +345,12 @@ deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 version = "0.3.23+4"
 
+[[deps.OpenSSH_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "OpenSSL_jll", "Zlib_jll"]
+git-tree-sha1 = "d783db56895ae3fddbed68ede2ace66b8c8af167"
+uuid = "9bd350c2-7e96-507f-8002-3f2e150b4e1b"
+version = "9.3.2+0"
+
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
 git-tree-sha1 = "af81a32750ebc831ee28bdaaba6e1067decef51e"
@@ -346,9 +370,14 @@ version = "1.6.3"
 
 [[deps.Oxygen]]
 deps = ["DataStructures", "Dates", "HTTP", "JSON3", "MIMEs", "Reexport", "RelocatableFolders", "Requires", "Sockets", "Statistics"]
-git-tree-sha1 = "38c6d004e71d9127001287ea12ef0de0f24e0173"
+git-tree-sha1 = "d58b409bf44de000aeff1ea1a4ed867ac257c9aa"
 uuid = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
-version = "1.5.4"
+version = "1.5.5"
+
+[[deps.PCRE2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
+version = "10.42.0+1"
 
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
@@ -358,7 +387,7 @@ version = "2.8.1"
 
 [[deps.PeaceFounder]]
 deps = ["ArgParse", "Base64", "CryptoGroups", "CryptoSignatures", "Dates", "DocStringExtensions", "HTTP", "HistoryTrees", "Infiltrator", "JSON3", "Nettle", "Oxygen", "Random", "Setfield", "ShuffleProofs", "StructHelpers", "StructTypes", "SwaggerMarkdown", "Tar", "Test", "URIs"]
-git-tree-sha1 = "6e1f01293fe19d966e3a51726420319656ac11a2"
+git-tree-sha1 = "fe08e20c26ab0e406b00f964e9582c5389fc07bd"
 repo-rev = "master"
 repo-url = "https://github.com/PeaceFounder/PeaceFounder.jl"
 uuid = "916f7771-afe2-4319-943d-0e770c333432"
@@ -478,9 +507,9 @@ version = "0.3.7"
 
 [[deps.StructHelpers]]
 deps = ["ConstructionBase"]
-git-tree-sha1 = "23c62ce3928ae46ecf67a3e88c70b2dcf0d69604"
+git-tree-sha1 = "8e678449dd7a5b82bd940a4589ae68a28a049a1d"
 uuid = "4093c41a-2008-41fd-82b8-e3f9d02b504f"
-version = "1.1.1"
+version = "1.1.2"
 
 [[deps.StructTypes]]
 deps = ["Dates", "UUIDs"]

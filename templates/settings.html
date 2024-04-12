@@ -52,7 +52,7 @@
         </div>
 
         <div class="btn-toolbar mb-2 mb-md-0">
-          <a href="#" class="btn btn-sm btn-primary d-inline-flex align-items-center ms-2" onclick="submitFormsReload(['smtpForm', 'inviteForm']);">  
+          <a href="#" class="btn btn-sm btn-primary d-inline-flex align-items-center ms-2" onclick="submitFormsReload(['smtpForm', 'inviteForm', 'gitForm']);">  
             Update Configuration
           </a>
         </div>
@@ -144,6 +144,89 @@
 
             </form>
           </div>
+
+
+
+          <script>
+            // Function to copy public key to clipboard
+            function copyPublicKey() {
+                /* Get the text field */
+                var copyText = document.getElementById("ssh-public-key");
+
+                /* Select the text field */
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); // For mobile devices
+
+                /* Copy the text inside the text field */
+                navigator.clipboard.writeText(copyText.value);
+
+                /* Alert the copied text */
+                // alert("Copied the public key: " + copyText.value);
+            }
+          </script>
+          
+
+        <div class="col-12">
+          <div class="card card-body border-0 shadow mb-4">
+
+            <div class="d-flex justify-content-between">
+              <h2 class="d-block h5 mb-4">Git Synchronization</h2>
+                <form method="POST" action="/settings/git-push">
+                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center" type="submit">
+                      Push to Remote
+                    </button>
+                </form>
+            </div>
+            
+
+              <div class="row">
+                
+                <div class="col-md-12 mb-3">
+                  <label for="first_name">SSH Public Key</label>
+                  <form method="POST" action="/settings/git-reset-pbkey">
+                  <div class="input-group">
+                    <input class="form-control" name="subject" type="text" value="{{SETTINGS.SSH_PUBLIC_KEY}}" placeholder="Use Reset to generate public key" id="ssh-public-key" readonly>
+                    
+                    <a class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center" onclick="copyPublicKey();">
+                      Copy
+                    </a>
+                    
+                  
+                      <button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center" type="submit">
+                        Reset
+                      </button>                  
+                  </div>
+                  </form>
+
+                </div>
+
+                <form method="POST" action="/settings/git-remote" id="gitForm">
+
+                  <input type="hidden" name="force" value="false" id="git-remote-force">
+
+                  <div class="col-md-12 mb-3">
+                    <label for="first_name">Git Remote</label>
+                    <div class="input-group">
+                      <input class="form-control" name="remote" type="text" value="{{GIT_REMOTE}}" placeholder="git@github.com:PeaceFounder/BuletinBoardDemo.git">
+
+
+                      <a class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center" onclick="document.getElementById('git-remote-force').value = 'true'; submitFormsReload(['gitForm']);">
+                        Force
+                      </a>
+
+                      <!-- <a href="#" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center" onclick="submitForm('smtp-test');"> -->
+                        <!--   Reset -->
+                        <!-- </a>                   -->
+
+                    </div>
+                  </div>
+                </form>
+
+              </div>              
+
+          </div>
+        </div>
+
 
 
           <div id="under-construction" class="col-12">
