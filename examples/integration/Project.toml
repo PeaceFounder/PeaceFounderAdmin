@@ -1,0 +1,9 @@
+[deps]
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+Infiltrator = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
+Nettle = "49dea1ee-f6fa-5aa6-9a11-8816cee7d4b9"
+Oxygen = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
+PeaceFounder = "916f7771-afe2-4319-943d-0e770c333432"
+URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"

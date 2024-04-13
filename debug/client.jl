@@ -15,7 +15,7 @@ function register(invite::Invite)
     push!(CLIENTS, client)
 end
 
-register(invite::String) = register(PeaceFounder.Parser.unmarshal(invite, Invite))
+register(invite::String) = register(Parser.unmarshal(invite, Invite))
 
 @post "/debug" function(req::Request)
 

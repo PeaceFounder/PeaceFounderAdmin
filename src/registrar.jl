@@ -173,6 +173,22 @@ function evict(ticketid::TicketID)
 end
 
 
+function create_profile(name::String, email::String, ticketid::TicketID)
+
+    for member in ELECTORAL_ROLL.ledger
+        if member.ticketid == ticketid
+            return member
+        end
+    end
+    
+    member = MemberProfile(name, email, ticketid)
+
+    push!(ELECTORAL_ROLL, member)
+    store(member)
+
+    return member
+end
+
 # This is registered in a roll
 function create_profile(name::String, email::String)
 

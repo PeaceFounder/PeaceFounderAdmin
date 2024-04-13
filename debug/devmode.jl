@@ -10,9 +10,10 @@ using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, appro
 
 
 ENV["USER_DATA"] = joinpath(tempdir(), "peacefounderadmin")
-rm(ENV["USER_DATA"], force=true, recursive=true)
-mkdir(ENV["USER_DATA"])
+#rm(ENV["USER_DATA"], force=true, recursive=true)
+#mkdir(ENV["USER_DATA"])
 
+include("../examples/integration/setup.jl")
 
 # For testing purposes
 function init_test_state()
@@ -43,6 +44,13 @@ function init_test_state()
 
     proposer = Mapper.PROPOSER[]
     demespec = Mapper.get_demespec() #Mapper.BRAID_CHAIN[].spec
+
+    token_key = Mapper.token_key()
+    token_length = Mapper.token_nlen()
+
+    println("TOKEN_LENGTH: $token_length")
+    println("TOKEN_KEY: $(bytes2hex(token_key))")
+
 
     PeaceFounderAdmin.SETTINGS.SMTP_EMAIL = "demeregistrar@inbox.lv"
     PeaceFounderAdmin.SETTINGS.SMTP_SERVER = "smtps://mail.inbox.lv:465"

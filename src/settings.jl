@@ -166,6 +166,8 @@ end
 
     SETTINGS.store()
 
+    Mapper.set_route(SETTINGS.SERVER_ROUTE)
+
     return
 end
 

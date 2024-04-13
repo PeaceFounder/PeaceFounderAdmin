@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{:TITLE}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="/static/style.css"/>
+    <script src="/static/main.js"></script>
+
+  </head>
+  <body class="form-v4">
+    <div class="page-content">
+      <div class="form-v4-content">
+	<div class="form-left">
+
+          <h2>{{:TITLE}}</h2>
+
+          <div class="text-1">
+            
+            {{{:PITCH}}}
+
+          </div>
+
+	</div>
+	<form class="form-detail" method="POST" action="/tickets" id="registrationForm">
+	  <h2>REGISTRATION FORM</h2>
+	  
+          <div class="form-row">
+	    <label for="name">Name</label>
+	    <input type="text" name="name" placeholder="Enter Name" id="name" class="input-text" required>
+	  </div>
+
+	  <div class="form-row">
+	    <label for="your_email">Email</label>
+	    <input type="text" name="email" placeholder="Enter Email" id="your_email" class="input-text" required pattern="[^@]+@[^@]+.[a-zA-Z]{2,6}">
+	  </div>
+
+	  <div class="form-row-last">
+	    <a class="register" onclick="submitForm('registrationForm');">Register</a>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </body>
+</html>
