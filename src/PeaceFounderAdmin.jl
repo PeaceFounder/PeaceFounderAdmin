@@ -102,8 +102,10 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
     elseif isempty(SETTINGS.SERVER_ROUTE)
         SETTINGS.SERVER_ROUTE = "http://$server_host:$server_port"
     end
-    
-    Mapper.set_route(SETTINGS.SERVER_ROUTE)
+
+    if SETUP_DONE
+        Mapper.set_route(SETTINGS.SERVER_ROUTE)    
+    end
 
     server_service = PeaceFounder.Server.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
     admin_service = AdminService.serve(port=admin_port, middleware=[admin_middleware..., SetupMiddleware], async=true)

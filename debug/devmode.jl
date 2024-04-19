@@ -124,10 +124,11 @@ function init_test_state()
     Client.update_deme!(dorian, demespec.uuid)
     Client.update_deme!(winston, demespec.uuid)
     
-    Client.cast_vote!(lisbeth, demespec.uuid, index, Selection(2))
+    Client.cast_vote!(lisbeth, demespec.uuid, index, Selection(2), seq = 1)
+    Client.cast_vote!(lisbeth, demespec.uuid, index, Selection(1), seq = 1)
     Client.cast_vote!(winston, demespec.uuid, index, Selection(2))
-    Client.cast_vote!(dorian, demespec.uuid, index, Selection(3), force=true)
     Client.cast_vote!(dorian, demespec.uuid, index, Selection(1))
+    Client.cast_vote!(dorian, demespec.uuid, index, Selection(3), force=true)
     Client.cast_vote!(winston, demespec.uuid, index, Selection(1))
     
 

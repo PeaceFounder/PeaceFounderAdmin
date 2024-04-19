@@ -16,33 +16,32 @@ end
 
 function create_view(bbox::BallotBoxController)
 
-    pseudonyms = voters(bbox)
     table = VoteView[]
 
+    bitmask = Model.tally_bitmask(bbox.ledger)
 
     for (cast, v) in enumerate(bbox.ledger)
 
         timestamp = Dates.format(v.timestamp, "d u yyyy, HH:MM")
         
-        alias = findindex(v.vote.seal.pbkey, pseudonyms)
+        alias = v.alias
+        anchor_index = bbox.ledger.proposal.anchor.index
+
         seq = v.vote.seq
 
-        selection = string(v.vote.selection.option)
-        next_vote = findnext(x -> x.vote.seal.pbkey == v.vote.seal.pbkey && x.vote.seq >= v.vote.seq, bbox.ledger.records, cast + 1)
-
-        if Model.isconsistent(v.vote.selection, bbox.ledger.proposal.ballot)
-
-            if isnothing(next_vote)
-                status = """<span class="fw-bold text-success">Valid</span>"""
-            else
-                status = """<span class="fw-bold text-warning">Overriden</span>""" # Overruled (used by higher outhorithy), Overloaded
-            end
-
+        if bitmask[cast]
+            status = """<span class="fw-bold text-success">Valid</span>"""
         else
-            status = """<span class="fw-bold text-danger">Malformed</span>"""
+            if Model.isconsistent(v.vote.selection, bbox.ledger.proposal.ballot)
+                # Overruled (used by higher outhorithy), Overloaded
+                status = """<span class="fw-bold text-warning">Overriden</span>""" 
+            else
+                status = """<span class="fw-bold text-danger">Malformed</span>"""
+            end
         end
-
-        vote_view = VoteView(cast, timestamp, string(alias), seq, selection, status)
+        
+        selection = string(v.vote.selection.option)
+        vote_view = VoteView(cast, timestamp, "#$anchor_index.$alias", seq, selection, status)
 
         push!(table, vote_view)
     end
@@ -61,7 +60,6 @@ end
         :TABLE => create_view(bbox)
     ]
 end
-
 
 
 function format_percent(fraction)

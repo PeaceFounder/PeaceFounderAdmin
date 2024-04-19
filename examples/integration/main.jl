@@ -19,7 +19,7 @@ dynamicfiles(joinpath(@__DIR__, "static"), "/static")
 
 INVITES::Dict{String, String} = Dict() # represents a local database
 
-InviteCode.TOKEN_KEY = "c73644e8e1f368a05f594481f011ff1f2a4e6880e342e13132fb9ab938a70b12" |> hex2bytes
+InviteCode.TOKEN_KEY = "bf8ed5eab3c0c3f114da1833a2dff57d79f2d7901d40bbb24c8c2947c057ab8e" |> hex2bytes
 InviteCode.TOKEN_LENGTH = 8
 
 SERVER = URI("http://127.0.0.1:4584")
@@ -77,7 +77,7 @@ end
         <h2>INVITE</h2>
         <p>To register to the deme enter a following invite code in PeaceFounder client:</p>
         <p class="code">$invite</p>
-        <p>Upon successful registration, your device will display a registration index, confirming your membership in the BraidChain ledger, granting you the right to vote on new proposals.</p>
+        <p>Upon successful registration, your device will display a registration index, confirming your membership in the BraidChain ledger, granting you the right to vote on upcoming proposals.</p>
         <div class="form-row-last" >
         <a class="register" onclick="location.reload();">Check</a>
 	</div>
