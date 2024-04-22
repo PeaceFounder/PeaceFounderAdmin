@@ -12,10 +12,8 @@ using PeaceFounder.Core.Model: CryptoSpec, pseudonym, TicketID, Membership, Prop
 module AdminService using Oxygen; @oxidise end
 import .AdminService: @get, @put, @post, @delete, Request, Response, dynamicfiles
 
-
 const TEMPLATES = joinpath(dirname(@__DIR__), "templates")
 dynamicfiles(joinpath(dirname(@__DIR__), "static"), "/static") # Static files would also be fine here
-
 
 include("utils.jl")
 include("setup.jl")
@@ -51,6 +49,28 @@ function SetupMiddleware(handler)
             else
                 return SETUP_DONE ? handler(req) : Response(302, Dict("Location" => "/setup"))
             end
+        end
+    end
+end
+
+
+const CORS_HEADERS = [
+    "Access-Control-Allow-Origin" => "*",
+    "Access-Control-Allow-Headers" => "*, Authorization",
+    "Access-Control-Allow-Methods" => "POST, GET, PUT, OPTIONS",
+    "Access-Control-Expose-Headers" => "*"
+]
+
+
+function CorsMiddleware(handler)
+    return function(req::Request)
+        # determine if this is a pre-flight request from the browser
+        if req.method == "OPTIONS"
+            return Response(200, CORS_HEADERS)  
+        else 
+            response = handler(req) # passes the request to the AuthMiddleware
+            append!(response.headers, CORS_HEADERS)
+            return response
         end
     end
 end
@@ -107,7 +127,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
         Mapper.set_route(SETTINGS.SERVER_ROUTE)    
     end
 
-    server_service = PeaceFounder.Server.Service.serve(async=true, port=server_port, host=server_host, middleware=server_middleware)
+    server_service = PeaceFounder.Server.Service.serve(async=true, port=server_port, host=server_host, middleware=[server_middleware..., CorsMiddleware])
     admin_service = AdminService.serve(port=admin_port, middleware=[admin_middleware..., SetupMiddleware], async=true)
     
     try 

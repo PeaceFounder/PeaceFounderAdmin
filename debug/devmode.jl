@@ -1,19 +1,33 @@
 using PeaceFounderAdmin
 
-using Dates
+using Dates: Dates, UTC
 using UUIDs
 
 using PeaceFounder
 using PeaceFounder: Client
 using PeaceFounder.Server: Mapper, Service
-using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid
+using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid, tracking_code, index
 
 
 ENV["USER_DATA"] = joinpath(tempdir(), "peacefounderadmin")
-#rm(ENV["USER_DATA"], force=true, recursive=true)
-#mkdir(ENV["USER_DATA"])
+rm(ENV["USER_DATA"], force=true, recursive=true)
+mkdir(ENV["USER_DATA"])
 
 include("../examples/integration/setup.jl")
+
+function cast_vote!(client, uuid, proposal, selection; force=true, seq=nothing)
+
+    Client.cast_vote!(client, uuid, proposal, selection; force, seq)
+
+    account = Client.select(client, uuid)
+    (; guard) = Client.get_proposal_instance(account, proposal)
+
+    code = tracking_code(guard, account.deme) |> bytes2hex
+    _index = index(guard)
+    println("TRACKING_CODE $_index: $code")
+    
+    return
+end
 
 # For testing purposes
 function init_test_state()
@@ -101,12 +115,12 @@ function init_test_state()
     commit = Mapper.BRAID_CHAIN[].commit
 
     proposal = Proposal(
-        uuid = UUIDs.uuid4(),
+        uuid = Base.UUID("49e9ebce-fb9e-5b83-1534-75cff3ee423a"),
         summary = "Should the city ban all personal vehicle usage and invest in alternative forms of transportation such as public transit, biking and walking infrastructure?",
         description = "",
         ballot = Ballot(["Yes", "No"]),
-        open = Dates.now(),
-        closed = Dates.now() + Dates.Second(600),
+        open = Dates.now(UTC),
+        closed = Dates.now(UTC) + Dates.Second(600),
         collector = id(Mapper.COLLECTOR[]), # should be deprecated
 
         state = commit.state
@@ -124,13 +138,12 @@ function init_test_state()
     Client.update_deme!(dorian, demespec.uuid)
     Client.update_deme!(winston, demespec.uuid)
     
-    Client.cast_vote!(lisbeth, demespec.uuid, index, Selection(2), seq = 1)
-    Client.cast_vote!(lisbeth, demespec.uuid, index, Selection(1), seq = 1)
-    Client.cast_vote!(winston, demespec.uuid, index, Selection(2))
-    Client.cast_vote!(dorian, demespec.uuid, index, Selection(1))
-    Client.cast_vote!(dorian, demespec.uuid, index, Selection(3), force=true)
-    Client.cast_vote!(winston, demespec.uuid, index, Selection(1))
-    
+    cast_vote!(lisbeth, demespec.uuid, index, Selection(2), seq = 1)
+    cast_vote!(lisbeth, demespec.uuid, index, Selection(1), seq = 1)
+    cast_vote!(winston, demespec.uuid, index, Selection(2))
+    cast_vote!(dorian, demespec.uuid, index, Selection(1))
+    cast_vote!(dorian, demespec.uuid, index, Selection(3), force=true)
+    cast_vote!(winston, demespec.uuid, index, Selection(1))
 
     return
 end

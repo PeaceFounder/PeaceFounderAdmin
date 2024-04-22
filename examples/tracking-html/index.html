@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centered Card Form with Equal Widths</title>
+
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="auth.js"></script>
+
+</head>
+<body>
+
+  <div class="card">
+    <div class="form-container">
+      <!-- <form id="myForm" action="http://127.0.0.1:8546/test" method="POST"> -->
+        <form id="myForm" action="http://127.0.0.1:4584/poolingstation/49e9ebce-fb9e-5b83-1534-75cff3ee423a/track" method="GET">
+          <input type="text" name="key" placeholder="Key">
+          <button type="button" onclick="submitForm()">Verify</button>
+        </form>
+    </div>
+    <div id="output" class="output"></div>
+  </div>
+
+  <script>
+
+    function hex2bytes(hexString) {
+        // Check if the hex string has an odd length and pad with zero if necessary
+        if (hexString.length % 2 !== 0) {
+            hexString = "0" + hexString;
+        }
+
+        // Create a Uint8Array with half the length of the hex string
+        const bytes = new Uint8Array(hexString.length / 2);
+
+        // Convert each pair of hex characters to a byte
+        for (let i = 0, j = 0; i < hexString.length; i += 2, j++) {
+            bytes[j] = parseInt(hexString.substring(i, i + 2), 16);
+        }
+
+        return bytes;
+    }
+
+
+    function submitForm() {
+        // Prevent the form from submitting traditionally
+        event.preventDefault();
+
+        // Get the name and surname values
+        let key_hex = document.getElementsByName('key')[0].value;
+        //let key = Buffer.from(key_hex, 'hex');
+        //let key = hex2bytes(key_hex);
+        let key = CryptoJS.enc.Hex.parse(key_hex);
+
+        form = document.getElementById('myForm')
+
+        fetchAuthorized(form.action, {
+            method: form.method,
+            headers: {'Content-Type': "text"}}, key)
+            .then(response => {
+                // Extract the text (body) from the response object
+                return response.text(); // This returns a Promise that resolves with the text body
+            })
+            .then(text => {
+                // Now 'text' contains the actual body of the response
+                document.getElementById('output').textContent = text;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('output').textContent = error;
+            });
+
+    }
+
+  </script>
+
+</body>
+</html>

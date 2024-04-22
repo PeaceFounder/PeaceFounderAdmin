@@ -26,7 +26,7 @@ end
 function row_view(record::DemeSpec, i::Int)
 
     type = "DemeSpec"
-    timestamp = Dates.format(record.seal.timestamp, "d u yyyy, HH:MM")
+    timestamp = Dates.format(record.seal.timestamp |> local_time, "d u yyyy, HH:MM")
     issuer = """<td><span class="fw-normal">Guardian</span></td>"""
     
     return RecordView(i, type, timestamp, issuer)
@@ -36,7 +36,7 @@ end
 function row_view(record::Membership, i::Int)
 
     type = "Membership"
-    timestamp = Dates.format(record.admission.seal.timestamp, "d u yyyy, HH:MM")
+    timestamp = Dates.format(record.admission.seal.timestamp |> local_time, "d u yyyy, HH:MM")
     issuer = """<td><span class="fw-normal">#1.Registrar</span></td>"""
     
     return RecordView(i, type, timestamp, issuer, "member")
@@ -46,7 +46,7 @@ end
 function row_view(record::BraidReceipt, i::Int) # Rename BraidWork to BraidReceipt
 
     type = "Braid Receipt"
-    timestamp = Dates.format(record.approval.timestamp, "d u yyyy, HH:MM") #"unimplemented date"
+    timestamp = Dates.format(record.approval.timestamp |> local_time, "d u yyyy, HH:MM") #"unimplemented date"
     uuid = record.producer.uuid
 
     issuer = """<td style="padding-top:5px; padding-bottom:0px;"><span class="fw-normal">#1.Braider<div style="font-size: 10px;">$uuid</div></span></td>"""
@@ -58,7 +58,7 @@ end
 function row_view(record::Proposal, i::Int)
 
     type = "Proposal"
-    timestamp = Dates.format(record.open, "d u yyyy, HH:MM")
+    timestamp = Dates.format(record.approval.timestamp |> local_time, "d u yyyy, HH:MM")
     issuer = """<td><span class="fw-normal">#1.Proposer</span></td>"""
 
     return RecordView(i, type, timestamp, issuer)
@@ -96,7 +96,7 @@ end
         :REGISTRAR => chunk_string(string(spec.registrar), 8) |> uppercase,
         :PROPOSER => chunk_string(string(spec.proposer), 8) |> uppercase,
         :BRAIDER => chunk_string(string(spec.braider), 8) |> uppercase,
-        :ISSUE_DATE => format_date_ordinal(spec.seal.timestamp)
+        :ISSUE_DATE => format_date_ordinal(spec.seal.timestamp |> local_time)
     ]
 end
 
@@ -109,9 +109,9 @@ end
         :GENERATOR => findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger.records, index - 1),
         :TICKETID => chunk_string(string(record.admission.ticketid), 8) |> uppercase,
         :IDENTITY => chunk_string(string(record.admission.id), 8) |> uppercase,
-        :ISSUE_TIMESTAMP => Dates.format(record.admission.seal.timestamp, "d u yyyy, HH:MM"),
+        :ISSUE_TIMESTAMP => Dates.format(record.admission.seal.timestamp |> local_time, "d u yyyy, HH:MM"),
         :PSEUDONYM => chunk_string(string(record.pseudonym), 8) |> uppercase,
-        :ACK_TIMESTAMP => format_date_ordinal(record.admission.seal.timestamp)
+        :ACK_TIMESTAMP => format_date_ordinal(record.admission.seal.timestamp |> local_time)
     ]
 end
 
@@ -148,7 +148,7 @@ end
         :MEMBER_COUNT => length(output_members),
         :INPUT_GENERATOR => input_generator,
         :ANONIMITY_THRESHOLD_GAIN => length(new_members),
-        :ISSUE_DATE => format_date_ordinal(braid.approval.timestamp),
+        :ISSUE_DATE => format_date_ordinal(braid.approval.timestamp |> local_time),
         :INPUT_PSEUDONYMS => input_pseudonyms
     ]
 end
@@ -161,8 +161,8 @@ end
         :INDEX => index,
         :TITLE => proposal.summary,
         :UUID => proposal.uuid,
-        :OPENS => Dates.format(proposal.open, "d u yyyy, HH:MM"),
-        :CLOSES => Dates.format(proposal.closed, "d u yyyy, HH:MM"),
+        :OPENS => Dates.format(proposal.open |> local_time, "d u yyyy, HH:MM"),
+        :CLOSES => Dates.format(proposal.closed |> local_time, "d u yyyy, HH:MM"),
         :ANCHOR => proposal.anchor.index,
         :MEMBER_COUNT => proposal.anchor.member_count,
         :BRAIDCHAIN_ROOT => join(["#$(proposal.anchor.index)", chunk_string(string(proposal.anchor.root), 8) |> uppercase], ":"),
@@ -170,7 +170,7 @@ end
         :DESCRIPTION => proposal.description,
         :BALLOT_TYPE => "Simple Ballot",
         :BALLOT => join(["""<p style="margin-bottom: 0;"> $i </p>""" for i in proposal.ballot.options],"\n"), # BALLOT_SPEC?
-        :ISSUE_DATE => format_date_ordinal(proposal.approval.timestamp)
+        :ISSUE_DATE => format_date_ordinal(proposal.approval.timestamp |> local_time)
     ]
 end
 
@@ -222,7 +222,7 @@ end
 @get "/braidchain/new-proposal" function(req::Request)
 
     return render_template("new-proposal.html") <| [
-        :TODAY => Dates.format(Dates.today(), "dd/mm/yyyy"),
+        :TODAY => Dates.format(Dates.today(), "dd/mm/yyyy"), # LOCAL TIME HERE
         :TOMORROW => Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy"),
         :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger.records)
     ]
@@ -267,8 +267,8 @@ end
         summary = title, # need to rename as title
         description = description,
         ballot = parsed_ballot,
-        open = open_datetime,
-        closed = close_datetime,
+        open = open_datetime |> utc_time,
+        closed = close_datetime |> utc_time,
         collector = spec.collector, # should be deprecated
         
         state = anchor_state # anchor, because the state is in the type

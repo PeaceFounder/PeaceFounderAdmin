@@ -1,4 +1,16 @@
+using Base: Regex, match
 using OpenSSL_jll: openssl 
+using Dates: Dates, DateTime, now, UTC
+
+function local_time(utc_time::DateTime)
+    utc_offset = now() - now(UTC) # perhaps it is optimized by compiler
+    return utc_time + utc_offset
+end
+
+function utc_time(local_time::DateTime)
+    utc_offset = now() - now(UTC) 
+    return local_time - utc_offset
+end
 
 function chunk_string(s::String, chunk_size::Int)
     return join([s[i:min(i+chunk_size-1, end)] for i in 1:chunk_size:length(s)], " ")
@@ -20,7 +32,6 @@ function render(fname, args...; kwargs...) # I could have a render template
 end
 
 #render(fname) = arg_vec -> render(fname, Dict(arg_vec))
-
 
 render_template(fname, args...; kwargs...) = render(joinpath(TEMPLATES, fname), args...; kwargs...) |> html
 
@@ -96,4 +107,28 @@ function openssl_decrypt(encrypted_data::String, password::String)
     close(process)  # Close the process
     
     return Vector{UInt8}(decrypted_data)
+end
+
+
+function extract_options(html_data::String)
+    # Regex to capture the value attribute and the text within the option tag
+    pattern = r"<option\s+value=\"([^\"]*)\"[^>]*>(.*?)<\/option>"
+    
+    # Using `eachmatch` to iterate over all matches in the input string
+    matches = eachmatch(pattern, html_data)
+    
+    # Extracting the captured groups from each match
+    options = [(m.captures[1], m.captures[2]) for m in matches]
+    
+    return options
+end
+
+function get_option_text(fname, key)
+
+    html_str = read(fname, String)
+    options = extract_options(html_str)
+
+    return get(Dict(options), key) do
+        error("$fname does not have an option with $key")
+    end
 end

@@ -5,24 +5,6 @@ using Oxygen: html, json
 
 global SETUP_DONE::Bool = false # Consider puttin within settings
 
-# This is in fact the only method I need
-function get_option_text(fname, value)
-
-    html_str = read(fname, String)
-
-    parsed_html = parsehtml(html_str)
-
-    options = eachmatch(Selector("option"), parsed_html.root)
-
-    for option in options
-        if (value == option.attributes["value"])
-            return strip(nodeText(option))
-        end
-    end
-
-    error("$fname does not have an option with $value")
-end
-
 
 @get "/setup" function(req::Request)
 

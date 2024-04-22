@@ -86,7 +86,7 @@ mutable struct MemberProfile
     created::DateTime # 
 end
 
-MemberProfile(name::String, email::String, ticket::TicketID) = MemberProfile(name, email, ticket, Dates.now())
+MemberProfile(name::String, email::String, ticket::TicketID) = MemberProfile(name, email, ticket, Dates.now(UTC))
 
 StructTypes.StructType(::Type{MemberProfile}) = StructTypes.Struct()
 
@@ -213,7 +213,7 @@ function create_profile(name::String, email::String)
 end
 
 
-function get(roll::ElectoralRoll, ticketid::TicketID)
+function Base.get(null::Function, roll::ElectoralRoll, ticketid::TicketID)
 
     for member in roll.ledger
         if member.ticketid == ticketid
@@ -221,7 +221,7 @@ function get(roll::ElectoralRoll, ticketid::TicketID)
         end
     end
 
-    return nothing
+    return null()
 end
 
 
@@ -245,7 +245,7 @@ function construct_view(profile::MemberProfile, state::MemberState = get_registr
     TICKETID = bytes2hex(ticketid)
 
 
-    TIMESTAMP = Dates.format(created, "d u yyyy, HH:MM")
+    TIMESTAMP = Dates.format(created |> local_time, "d u yyyy, HH:MM")
 
     STATUS_ACTIONS = """
 <td style="padding-top:5px; padding-bottom:0;">
@@ -377,7 +377,10 @@ end
 
     ticketid = TicketID(hex2bytes(tid))
 
-    profile = get(ELECTORAL_ROLL, ticketid)
+    profile = get(ELECTORAL_ROLL, ticketid) do
+        error("Wrong TicketID")
+    end
+
     invite = Mapper.enlist_ticket(profile.ticketid, reset=true) 
 
     send(invite, profile)

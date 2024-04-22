@@ -22,7 +22,7 @@ function create_view(bbox::BallotBoxController)
 
     for (cast, v) in enumerate(bbox.ledger)
 
-        timestamp = Dates.format(v.timestamp, "d u yyyy, HH:MM")
+        timestamp = Dates.format(v.timestamp |> local_time, "d u yyyy, HH:MM")
         
         alias = v.alias
         anchor_index = bbox.ledger.proposal.anchor.index
