@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="auth.js"></script>
+<script src="main.js"></script>
 
 </head>
 <body>
@@ -15,8 +16,8 @@
   <div class="card">
     <div class="form-container">
       <form id="myForm" action="http://127.0.0.1:4584/poolingstation/" method="GET">
-        <!-- <input type="text" name="bbox" value="49e9ebce-fb9e-5b83-1534-75cff3ee423a" placeholder="UUID"> -->
-        <input type="text" name="bbox" value="e66a0d3b-c984-4481-a1d6-fc3babb95a05" placeholder="UUID">
+        <input type="text" name="bbox" value="49e9ebce-fb9e-5b83-1534-75cff3ee423a" placeholder="UUID">
+        <!-- <input type="text" name="bbox" value="da4066d5-8033-4a8e-b880-11d9f5518607" placeholder="UUID"> -->
         <input type="text" name="key" placeholder="Key">
         <button type="button" onclick="submitForm()">Verify</button>
         </form>
@@ -25,7 +26,6 @@
   </div>
 
   <script>
-
 
     function update_output_div(keyValuePairs) {
 
@@ -56,53 +56,6 @@
         });
     }
 
-
-    function format_timestamp(isoString) {
-
-        // Convert the string to a Date object
-        let date = new Date(isoString + "Z");
-
-        // Format the date part
-        let formattedDate = date.toLocaleDateString('en-GB', {
-            day: '2-digit',    // "22"
-            month: 'short',    // "Apr"
-            year: 'numeric'    // "2024"
-        });
-
-        // Format the time part
-        let formattedTime = date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',       // "21" (note: ensure to adjust according to your local timezone)
-            minute: '2-digit',     // "32"
-            hour12: false          // 24-hour format
-        });
-
-        // Combine both parts
-        let nicelyFormatted = `${formattedDate}, ${formattedTime}`;
-
-        return nicelyFormatted
-    }
-
-    function hex2bytes(hexString) {
-        // Check if the hex string has an odd length and pad with zero if necessary
-        if (hexString.length % 2 !== 0) {
-            hexString = "0" + hexString;
-        }
-
-        // Create a Uint8Array with half the length of the hex string
-        const bytes = new Uint8Array(hexString.length / 2);
-
-        // Convert each pair of hex characters to a byte
-        for (let i = 0, j = 0; i < hexString.length; i += 2, j++) {
-            bytes[j] = parseInt(hexString.substring(i, i + 2), 16);
-        }
-
-        return bytes;
-    }
-
-    function parseHex(rawString) {
-        return rawString.replace(/-/g, '').toLowerCase();
-    }
-
     function update_output(json_string) {
 
         let obj = JSON.parse(json_string);
@@ -126,10 +79,8 @@
 
         // Get the name and surname values
         let bbox = document.getElementsByName('bbox')[0].value;
-        let key_hex = document.getElementsByName('key')[0].value;
-        //let key = Buffer.from(key_hex, 'hex');
-        //let key = hex2bytes(key_hex);
-        let key = CryptoJS.enc.Hex.parse(parseHex(key_hex));
+        let key_base32 = document.getElementsByName('key')[0].value;
+        let key = CrockfordDecode(key_base32);
 
         form = document.getElementById('myForm')
 

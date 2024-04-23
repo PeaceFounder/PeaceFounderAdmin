@@ -6,8 +6,7 @@ using UUIDs
 using PeaceFounder
 using PeaceFounder: Client
 using PeaceFounder.Server: Mapper, Service
-using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid, tracking_code, index
-
+using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid, index
 
 ENV["USER_DATA"] = joinpath(tempdir(), "peacefounderadmin")
 rm(ENV["USER_DATA"], force=true, recursive=true)
@@ -22,7 +21,7 @@ function cast_vote!(client, uuid, proposal, selection; force=true, seq=nothing)
     account = Client.select(client, uuid)
     (; guard) = Client.get_proposal_instance(account, proposal)
 
-    code = tracking_code(guard, account.deme) |> bytes2hex
+    code = Client.tracking_code(guard, account.deme)
     _index = index(guard)
     println("TRACKING_CODE $_index: $code")
     

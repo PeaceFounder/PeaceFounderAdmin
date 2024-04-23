@@ -2,6 +2,7 @@ using Nettle
 using HTTP: HTTP, Request, Response
 using Base64
 using PeaceFounder.Authorization: AuthClientMiddleware # In future this will be in a seperate package
+using PeaceFounder.Base32: decode_crockford_base32 # In future this will be in a seperate package
 using URIs
 using Base: UUID
 using JSON3
@@ -30,6 +31,10 @@ function track_vote(server::URI, proposal::UUID, code::Vector{UInt8})
     end
 end
 
+function track_vote(server::URI, proposal::UUID, code::String)
+    code_bytes = replace(code, "-" => "") |> decode_crockford_base32
+    return track_vote(server, proposal, code_bytes)
+end
 
 
 SERVER = URI("http://127.0.0.1:4584")
