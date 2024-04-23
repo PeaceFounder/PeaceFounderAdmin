@@ -41,3 +41,29 @@ button {
   cursor: pointer;
   width: 100px;
 }
+
+
+.pair {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+
+.key {
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+    width: 80px;
+    margin-right: 10px;
+    font-family: Helvetica, sans-serif; 
+    font-size: 14px;
+}
+
+.value {
+    color: #666;
+    text-align: left;
+    flex: 1;
+    font-family: Helvetica, sans-serif; 
+    font-size: 14px;
+}

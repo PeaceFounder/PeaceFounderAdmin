@@ -14,16 +14,73 @@
 
   <div class="card">
     <div class="form-container">
-      <!-- <form id="myForm" action="http://127.0.0.1:8546/test" method="POST"> -->
-        <form id="myForm" action="http://127.0.0.1:4584/poolingstation/49e9ebce-fb9e-5b83-1534-75cff3ee423a/track" method="GET">
-          <input type="text" name="key" placeholder="Key">
-          <button type="button" onclick="submitForm()">Verify</button>
+      <form id="myForm" action="http://127.0.0.1:4584/poolingstation/" method="GET">
+        <!-- <input type="text" name="bbox" value="49e9ebce-fb9e-5b83-1534-75cff3ee423a" placeholder="UUID"> -->
+        <input type="text" name="bbox" value="e66a0d3b-c984-4481-a1d6-fc3babb95a05" placeholder="UUID">
+        <input type="text" name="key" placeholder="Key">
+        <button type="button" onclick="submitForm()">Verify</button>
         </form>
     </div>
     <div id="output" class="output"></div>
   </div>
 
   <script>
+
+
+    function update_output_div(keyValuePairs) {
+
+        const outputDiv = document.getElementById('output');
+        outputDiv.textContent = "";
+
+        keyValuePairs.forEach(pair => {
+            // Create the pair container div
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'pair';
+
+            // Create the key div
+            const keyDiv = document.createElement('div');
+            keyDiv.className = 'key';
+            keyDiv.textContent = pair.key;
+
+            // Create the value div
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'value';
+            valueDiv.textContent = pair.value;
+
+            // Append key and value to the pair div
+            pairDiv.appendChild(keyDiv);
+            pairDiv.appendChild(valueDiv);
+
+            // Append the pair div to the output container
+            outputDiv.appendChild(pairDiv);
+        });
+    }
+
+
+    function format_timestamp(isoString) {
+
+        // Convert the string to a Date object
+        let date = new Date(isoString + "Z");
+
+        // Format the date part
+        let formattedDate = date.toLocaleDateString('en-GB', {
+            day: '2-digit',    // "22"
+            month: 'short',    // "Apr"
+            year: 'numeric'    // "2024"
+        });
+
+        // Format the time part
+        let formattedTime = date.toLocaleTimeString('en-GB', {
+            hour: '2-digit',       // "21" (note: ensure to adjust according to your local timezone)
+            minute: '2-digit',     // "32"
+            hour12: false          // 24-hour format
+        });
+
+        // Combine both parts
+        let nicelyFormatted = `${formattedDate}, ${formattedTime}`;
+
+        return nicelyFormatted
+    }
 
     function hex2bytes(hexString) {
         // Check if the hex string has an odd length and pad with zero if necessary
@@ -42,20 +99,41 @@
         return bytes;
     }
 
+    function parseHex(rawString) {
+        return rawString.replace(/-/g, '').toLowerCase();
+    }
+
+    function update_output(json_string) {
+
+        let obj = JSON.parse(json_string);
+
+        let keyValuePairs = [
+            { key: 'CastRecord', value: obj.index },
+            { key: 'TimeStamp', value: format_timestamp(obj.timestamp) },
+            { key: 'Pseudonym', value: obj.alias },
+            { key: 'Seq', value: obj.seq },
+            { key: 'Status', value: obj.status.toUpperCase() },
+            { key: 'Selection', value: obj.selection.option }
+            // Add more pairs as needed
+        ];
+
+        update_output_div(keyValuePairs);
+    }
 
     function submitForm() {
         // Prevent the form from submitting traditionally
         event.preventDefault();
 
         // Get the name and surname values
+        let bbox = document.getElementsByName('bbox')[0].value;
         let key_hex = document.getElementsByName('key')[0].value;
         //let key = Buffer.from(key_hex, 'hex');
         //let key = hex2bytes(key_hex);
-        let key = CryptoJS.enc.Hex.parse(key_hex);
+        let key = CryptoJS.enc.Hex.parse(parseHex(key_hex));
 
         form = document.getElementById('myForm')
 
-        fetchAuthorized(form.action, {
+        fetchAuthorized(form.action + bbox + "/track", {
             method: form.method,
             headers: {'Content-Type': "text"}}, key)
             .then(response => {
@@ -63,8 +141,8 @@
                 return response.text(); // This returns a Promise that resolves with the text body
             })
             .then(text => {
-                // Now 'text' contains the actual body of the response
-                document.getElementById('output').textContent = text;
+                console.log(text);
+                update_output(text);
             })
             .catch(error => {
                 console.error('Error:', error);
