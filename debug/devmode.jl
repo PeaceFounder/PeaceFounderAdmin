@@ -18,7 +18,10 @@ function cast_vote!(client, uuid, proposal, selection; force=true, seq=nothing)
 
     Client.cast_vote!(client, uuid, proposal, selection; force, seq)
 
-    account = Client.select(client, uuid)
+    #account = Client.select(client, uuid)
+    account = get(client, uuid) do
+        error("Account with uuid $uuid is not found") 
+    end
     (; guard) = Client.get_proposal_instance(account, proposal)
 
     code = Client.tracking_code(guard, account.deme)
@@ -55,7 +58,7 @@ function init_test_state()
 
     end
 
-    proposer = Mapper.PROPOSER[]
+    proposer = Mapper.PROPOSER
     demespec = Mapper.get_demespec() #Mapper.BRAID_CHAIN[].spec
 
     token_key = Mapper.token_key()
@@ -78,7 +81,6 @@ function init_test_state()
     # create_profile("Walter White", "DEBUG").state = Registered(3, false)
     # create_profile("Indiana Jones", "DEBUG").state = Registered(3, true)
     # create_profile("Luke Skywalker", "DEBUG").state = Terminated(4, 6)
-
     
     Mapper.set_route(PeaceFounderAdmin.SETTINGS.SERVER_ROUTE)
     PeaceFounderAdmin.SETUP_DONE = true
@@ -105,13 +107,13 @@ function init_test_state()
     input_generator = Mapper.get_generator()
     input_members = Mapper.get_members()
 
-    braidreceipt = braid(input_generator, input_members, demespec.crypto, demespec, Mapper.BRAIDER[]) 
+    braidreceipt = braid(input_generator, input_members, demespec.crypto, demespec, Mapper.BRAIDER) 
 
     Mapper.submit_chain_record!(braidreceipt)
 
     # Adding of a proposal
 
-    commit = Mapper.BRAID_CHAIN[].commit
+    commit = Mapper.BRAID_CHAIN.commit
 
     proposal = Proposal(
         uuid = Base.UUID("49e9ebce-fb9e-5b83-1534-75cff3ee423a"),
@@ -120,7 +122,7 @@ function init_test_state()
         ballot = Ballot(["Yes", "No"]),
         open = Dates.now(UTC),
         closed = Dates.now(UTC) + Dates.Second(600),
-        collector = id(Mapper.COLLECTOR[]), # should be deprecated
+        collector = id(Mapper.COLLECTOR), # should be deprecated
 
         state = commit.state
     ) |> approve(proposer)

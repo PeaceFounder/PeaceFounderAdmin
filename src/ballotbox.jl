@@ -52,7 +52,7 @@ end
 
 @get "/braidchain/{index}/ballotbox" function(req::Request, index::Int)
     
-    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    proposal = Mapper.BRAID_CHAIN.ledger[index]
     bbox = Mapper.get_ballotbox(proposal.uuid)
 
     return render_template("proposal_ballotbox.html") <| [
@@ -77,7 +77,7 @@ using Infiltrator
 
 @get "/braidchain/{index}/tally" function(req::Request, index::Int)
 
-    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    proposal = Mapper.BRAID_CHAIN.ledger[index]
     bbox = Mapper.get_ballotbox(proposal.uuid)
 
     # Assumes that only valid pseudonyms have signed the votes, which is true
@@ -118,7 +118,7 @@ end
 
 @post "/braidchain/{index}/tally" function(req::Request, index::Int)
     
-    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    proposal = Mapper.BRAID_CHAIN.ledger[index]
     Mapper.tally_votes!(proposal.uuid)
 
     return Response(301, Dict("Location" => "/braidchain/$index/tally"))

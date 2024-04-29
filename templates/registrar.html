@@ -1,3 +1,4 @@
+
 <!--
 
 =========================================================
@@ -31,10 +32,6 @@
     {{>partials/sidenav.html}}
     
     <main class="content">
-
-      
-      <!--     "path": ".." -->
-      <!-- }) -->
 
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div class="d-block mb-4 mb-md-0">
@@ -70,12 +67,13 @@
       <div class="card card-body border-0 shadow table-wrapper table-responsive">
         <table class="table table-hover">
           <thead>
-            <tr>
+            <tr> 
               <th class="border-gray-200">#</th>
-              <th class="border-gray-200">Name</th>						
+              <th class="border-gray-200">Name</th>
               <th class="border-gray-200">Email</th>
               <th class="border-gray-200">Issue Date</th>
               <th class="border-gray-200">Status</th>
+              <th class="border-gray-200" style="text-align: right; padding-right: 40px;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -89,7 +87,10 @@
               </td>
               <td><span class="fw-normal">{{EMAIL}}</span></td>                        
               <td><span class="fw-normal">{{TIMESTAMP}}</span></td>
-              {{{STATUS}}}
+              <td>{{{STATUS}}}</td>
+              <!-- <td style="text-align: right; width: 70px; padding-top:5px; padding-bottom:0;"><span class="fw-normal" >{{{ACTION}}}</span></td> -->
+              {{{ACTION}}}
+              <!-- <td style="text-align: right; width: 70px;"><span class="fw-normal" ></span></td> -->
             </tr>
             {{/TABLE}}
 

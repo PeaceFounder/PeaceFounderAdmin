@@ -15,26 +15,43 @@ abstract type MemberState end
 
 struct Invited <: MemberState 
     expired::Bool
+    timestamp::Union{DateTime, Nothing}
+
+    Invited() = new(true, nothing)
+    Invited(expired::Bool, timestamp::DateTime) = new(expired, timestamp)
 end 
 
 struct Admitted <: MemberState 
     expired::Bool
+    timestamp::DateTime
 end
 
 struct Registered <: MemberState
-    registered::Int
-    verified::Bool
+    index::Int # registerd
+    # invited::Union{DateTime, Nothing}
+    admitted::DateTime # for registration, it may make sense to put timestamps in as an vector
+    registered::DateTime
+    verified::Union{DateTime, Nothing}
+    
+    Registered(index::Int, admitted::DateTime, registered::DateTime) = new(index, admitted, registered, nothing)
+    Registered(state::Registered, verified::DateTime) = new(state.index, state.admitted, state.registered, verified)
 end
 
 struct Terminated <: MemberState
-    registered::Int
-    terminated::Int
+    rindex::Int
+    tindex::Int
+    admitted::DateTime
+    registered::DateTime
+    verified::Union{DateTime, Nothing} # May never have been verified
+    terminated::DateTime
+    
+    Terminated(rindex::Int, tindex::Int, admitted::DateTime, registered::DateTime, terminated::DateTime; verified = nothing) = 
+        new(rindex, tindex, admitted, registered, verified, terminated)
+    Terminated(state::Terminated, verified::DateTime) = new(state.rindex, state.tindex, state.admitted, state.registered, verified, state.terminated)
 end
 
 
-
-
-function get_registration_index(chain, ticketid::TicketID)
+function get_registration_index(null::Function, chain, ticketid::TicketID)
 
     for (i, record) in enumerate(chain.ledger)
         if record isa Membership && record.admission.ticketid == ticketid
@@ -42,40 +59,99 @@ function get_registration_index(chain, ticketid::TicketID)
         end
     end
 
-    return nothing
+    return null()
 end
 
+function get_termination_index(null::Function, chain, identity::Pseudonym)
 
+    for (i, record) in enumerate(chain.ledger)
+        if record isa Termination && record.identity == identity
+            return i
+        end
+    end
+
+    return null()
+end
+
+using Infiltrator
+
+function must_throw(null::Function)
+    return function ()
+        null()
+        error("Null must throw in the context")
+    end
+end
+    
+function get_registration_state_chain(null::Function, chain, ticketid::TicketID)
+
+    # Here it would be necessary to throw to a parrent
+    # index = get_registration_index(@parent null, chain, ticketid)
+    index = get_registration_index(must_throw(null), chain, ticketid) # the null does not compose as I still need to return from the call stack
+    
+    record = chain[index]
+
+    admission_timestamp = record.admission.seal.timestamp
+    registration_timestamp = record.approval.timestamp
+
+    # term_index = @promote_return get_termination_index(chain, ticketid) do
+    #     return Registered(index, admission_timestamp, registration_timestamp)
+    # end
+    term_index = get_termination_index(chain, id(record)) do
+        return nothing # annoingly there is no parrent return 
+    end
+
+    if isnothing(term_index)
+        return Registered(index, admission_timestamp, registration_timestamp)
+    else
+        term_record = chain[term_index]
+        termination_timestamp = term_record.seal.timestamp
+        return Terminated(index, term_index, admission_timestamp, registration_timestamp, termination_timestamp)
+    end
+end
+
+# This code is an experimentation for a situation if there were a parent return
+# no performance of this code is expected 
+# An example how this function would look like with @promote_return macro
+# function get_registration_status(ticketid::TicketID)
+#     return @promote_return get_registration_state_chain(Mapper.BRAID_CHAIN[], ticketid) do
+
+#         ticket = get(Mapper.REGISTRAR[], ticketid) do
+#             @warn "Ticket not in registrar; Perhaps the system have been reset during member registration"
+#             return Invited()
+#         end
+        
+#         if isnothing(ticket.admission)
+#             return Invited(false, ticket.timestamp)
+#         else
+#             return Admitted(false, ticket.admission.seal.timestamp)
+#         end
+#     end
+# end
 function get_registration_status(ticketid::TicketID)
+    try return get_registration_state_chain(Mapper.BRAID_CHAIN, ticketid) do
 
-    registration_index = get_registration_index(Mapper.BRAID_CHAIN[], ticketid)
+        ticket = get(Mapper.REGISTRAR, ticketid) do
 
-    if isnothing(registration_index)
-
-        try
-
-            admission_state = ProtocolSchema.isadmitted(ticketid, Mapper.REGISTRAR[]) # arguments could be reverse
-            
-            if !admission_state
-                return Invited(false)
-            else
-                return Admitted(false)
-            end
-
-        catch
-            
             # it is uknonw at this point whether client already had obtained an admission
             # the safest option is to say it is expired. In case ticket is renewed and dublicate 
             # admission is issued we rely on braidchain to drop memebership registrations with the same ticketid
             
-            return Invited(true) 
+            @warn "Ticket not in registrar; Perhaps the system have been reset during member registration"
+            throw(Invited()) # the value would need to be thrown in a wrapping
+        end
+        
+        if isnothing(ticket.admission)
+            throw(Invited(false, ticket.timestamp))
+        else
+            throw(Admitted(false, ticket.admission.seal.timestamp))
+        end
+    end catch value
+        if value isa MemberState # For a generic case I would need boxing here
+            return value
+        else
+            rethrow(value)
         end
     end
-
-    # To check if profile is verified we need to go through ElectoralRoll and check attribute for the profile 
-    
-    # One could proceed looking termination transaction in future
-    return Registered(registration_index, false)
 end
 
 
@@ -140,6 +216,9 @@ function load(::Type{ElectoralRoll}, dir::String)
     
     sort!(roll)
 
+    # We also need to consider orphaned records from the braidchain ledger to recover from a failure
+    # There is also possibility that an orphaned record is about to be created
+
     return roll
 end
 
@@ -151,22 +230,60 @@ end
 load(::Type{MemberProfile}, ticketid::TicketID) = load(MemberProfile, joinpath(REGISTRAR_PATH, "records", string(ticketid), "metadata.json"))
 
 
-function evict(ticketid::TicketID)
+function get_admission(registrar, ticketid)
+    ticket = get(registrar, ticketid) do
+        error("Ticket $ticketid not found") # 
+    end
+
+    return ticket.admission
+end
+
+
+function evict_electoral_roll_entry(ticketid)
 
     roll_index = findfirst(x -> x.ticketid == ticketid, ELECTORAL_ROLL.ledger)
     deleteat!(ELECTORAL_ROLL.ledger, roll_index)
-
-    try
-        Mapper.delete_ticket(ticketid)
-    catch
-        @warn "If admission is issued bur member is only about to register then it will be orphaned. The record will be moved in `registrar/evictees` if needed for recovery."
-    end
     
     if !isempty(REGISTRAR_PATH) && isdir(joinpath(REGISTRAR_PATH, "records", string(ticketid)))
 
         mkpath(joinpath(REGISTRAR_PATH, "evictees"))
         mv(joinpath(REGISTRAR_PATH, "records", string(ticketid)), joinpath(REGISTRAR_PATH, "evictees", string(ticketid)))
 
+    end
+
+    return
+end
+
+using Infiltrator
+
+function evict(ticketid::TicketID)
+
+    status = get_registration_status(ticketid)
+
+    if status isa Invited
+
+        Mapper.delete_ticket(ticketid) do
+            @warn "If admission is issued but member is only about to register then it will be orphaned. The record will be moved in `registrar/evictees` if needed for recovery."
+        end
+           
+        evict_electoral_roll_entry(ticketid)
+        
+    elseif status isa Admitted
+
+        admission = get_admission(Mapper.REGISTRAR, ticketid)
+        termination = Termination(id(admission)) |> approve(Mapper.REGISTRAR.signer)
+        Mapper.submit_chain_record!(termination)
+
+        evict_electoral_roll_entry(ticketid)
+
+    elseif status isa Registered
+        
+        record = Mapper.get_chain_record(status.index)
+        termination = Termination(status.index, id(record)) |> approve(Mapper.REGISTRAR.signer)
+        Mapper.submit_chain_record!(termination)
+
+    elseif status isa Terminated
+        error("A member with $ticketid already terminated")
     end
 
     return
@@ -233,6 +350,7 @@ struct MemberProfileView
     TIMESTAMP::String 
     REGISTRATION::String # Can be HTML and etc. Whatever works here
     STATUS::String
+    ACTION::String
 end
 
 
@@ -244,57 +362,74 @@ function construct_view(profile::MemberProfile, state::MemberState = get_registr
     EMAIL = email
     TICKETID = bytes2hex(ticketid)
 
-
     TIMESTAMP = Dates.format(created |> local_time, "d u yyyy, HH:MM")
 
-    STATUS_ACTIONS = """
-<td style="padding-top:5px; padding-bottom:0;">
-<button class="btn btn-sm btn-outline-danger" style="margin-right: 5px;" type="button" onclick="sendSignal('registrar/$TICKETID', 'DELETE');">Cancel</button>
-<button class="btn btn-sm btn-outline-primary" type="button" onclick="sendSignal('registrar/$TICKETID', 'PUT');">Retry</button></td>
-        """
+    td_actions(str) = """
+        <td style="text-align: right; width: 70px; padding-top:5px; padding-bottom:0;"><span class="fw-normal" >$str</span></td>
+    """
 
     if state isa Invited
 
-        STATUS = STATUS_ACTIONS
+        STATUS = """<span class="fw-bold">Invited</a>"""
 
         if state.expired
-            REGISTRATION = """<a href="#" class="fw-bold text-danger">Invited-Expired</a>"""
+            REGISTRATION = """<span class="fw-bold text-danger">Expired</a>"""
         else
-            REGISTRATION = """<a href="#" class="fw-bold text-success">Invited</a>"""
+            REGISTRATION = """<span class="fw-bold text-success">Pending</a>"""
         end
+
+        ACTION = """
+    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="sendSignal('registrar/$TICKETID', 'PUT');">Retry</button>
+    <button class="btn btn-sm btn-outline-danger"  type="button" onclick="sendSignal('registrar/$TICKETID', 'DELETE');">Abort</button>
+
+    """ |> td_actions
 
     elseif state isa Admitted
 
+        STATUS = """<span class="fw-bold text-warning">Admitted</a>"""
+
         if state.expired
 
-            REGISTRATION = """<a href="#" class="fw-bold text-danger">Admitted-Expired</a>"""
+            REGISTRATION = """<span class="fw-bold text-danger">Admitted-Expired</a>"""
             STATUS = STATUS_ACTIONS
 
         else
 
-            REGISTRATION = """<a href="#" class="fw-bold text-success">Admitted</a>"""
-            STATUS = """<td><span class="fw-bold">Pending</span></td>"""
+            REGISTRATION = """<span class="fw-bold text-success">Pending</a>"""
+            STATUS = """<span class="fw-bold">Admitted</span>"""
 
         end
+
+        ACTION = """
+           <button class="btn btn-sm btn-outline-danger"  type="button" onclick="sendSignal('registrar/$TICKETID', 'DELETE');">Abort</button>
+        """ |> td_actions
 
     elseif state isa Registered
         
-        REGISTRATION = string(state.registered)
+        REGISTRATION = string(state.index)
 
-        if state.verified
-            STATUS = """<td><span class="fw-bold text-success">Verified</span></td>"""
+        if !isnothing(state.verified)
+            STATUS = """<span class="fw-bold text-success">Verified</span>"""
         else
-            STATUS = """<td><span class="fw-bold text-warning">Trial</span></td>"""
+            STATUS = """<span class="fw-bold">Trial</span>"""
         end
+
+        ACTION = """<button class="btn btn-sm btn-outline-danger"  type="button" onclick="sendSignal('registrar/$TICKETID', 'DELETE');">Terminate</button>""" |> td_actions
 
     elseif state isa Terminated
 
-        REGISTRATION = string(state.registered)
-        STATUS = """<td><span class="fw-bold text-danger">Terminated</span></td>"""
+        REGISTRATION = string(state.rindex)
+
+        terminated = Dates.format(state.terminated |> local_time, "d u yyyy, HH:MM")
+
+        STATUS = """<span class="fw-bold">Terminated</span>"""
+        ACTION = """<td style="text-align: right; width: 70px;"><span class="fw-normal" ><span>$terminated</span></td>"""
 
     end
 
-    return MemberProfileView(TICKETID, NAME, EMAIL, TIMESTAMP, REGISTRATION, STATUS)
+    
+
+    return MemberProfileView(TICKETID, NAME, EMAIL, TIMESTAMP, REGISTRATION, STATUS, ACTION)
 end
 
 

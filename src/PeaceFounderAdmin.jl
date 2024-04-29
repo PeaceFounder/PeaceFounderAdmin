@@ -7,7 +7,7 @@ using UUIDs
 
 using PeaceFounder.Server: Mapper
 using PeaceFounder.Core: Model
-using PeaceFounder.Core.Model: CryptoSpec, pseudonym, TicketID, Membership, Proposal, Ballot, Selection, generator, state, id, seed, tally, approve, istallied, DemeSpec, hasher, isbinding, Generator, generate, Signer
+using PeaceFounder.Core.Model: CryptoSpec, Pseudonym, pseudonym, TicketID, Membership, Termination, Proposal, Ballot, Selection, generator, state, id, seed, tally, approve, istallied, DemeSpec, hasher, isbinding, Generator, generate, Signer
 
 module AdminService using Oxygen; @oxidise end
 import .AdminService: @get, @put, @post, @delete, Request, Response, dynamicfiles

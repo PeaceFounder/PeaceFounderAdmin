@@ -66,11 +66,9 @@ end
 
 
 @get "/braidchain" function(req::Request)
-    
-    table = RecordView[row_view(r, i) for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger)]
-    
-    #return render(joinpath(TEMPLATES, "buletinboard.html"), Dict("TABLE"=>table)) |> html
 
+    table = RecordView[row_view(r, i) for (i, r) in enumerate(Mapper.BRAID_CHAIN.ledger)]
+    
     return render_template("buletinboard.html") <| [
         :TABLE => table
     ]
@@ -79,7 +77,7 @@ end
 
 @get "/braidchain/{index}/demespec" function(req::Request, index::Int)
 
-    spec = Mapper.BRAID_CHAIN[].ledger[index]
+    spec = Mapper.BRAID_CHAIN.ledger[index]
 
     return render_template("deme.html") <| [
         :INDEX => index,
@@ -102,11 +100,11 @@ end
 
 @get "/braidchain/{index}/member" function(req::Request, index::Int)
 
-    record = Mapper.BRAID_CHAIN[].ledger[index]
+    record = Mapper.BRAID_CHAIN.ledger[index]
 
     return render_template("member.html") <| [
         :INDEX => index,
-        :GENERATOR => findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger.records, index - 1),
+        :GENERATOR => findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN.ledger.records, index - 1),
         :TICKETID => chunk_string(string(record.admission.ticketid), 8) |> uppercase,
         :IDENTITY => chunk_string(string(record.admission.id), 8) |> uppercase,
         :ISSUE_TIMESTAMP => Dates.format(record.admission.seal.timestamp |> local_time, "d u yyyy, HH:MM"),
@@ -123,15 +121,15 @@ end
 
 @get "/braidchain/{index}/braid" function(req::Request, index::Int)
     
-    input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN[].ledger.records, index - 1)
+    input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN.ledger.records, index - 1)
 
-    braid = Mapper.BRAID_CHAIN[].ledger[index]
+    braid = Mapper.BRAID_CHAIN.ledger[index]
 
     output_members = Model.output_members(braid)
-    new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN[].ledger) if r isa Membership && i > input_generator]
+    new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN.ledger) if r isa Membership && i > input_generator]
     new_member_string = join(["#$i" for i in new_members], ", ")
 
-    if Mapper.BRAID_CHAIN[].ledger[input_generator] isa BraidReceipt
+    if Mapper.BRAID_CHAIN.ledger[input_generator] isa BraidReceipt
         input_pseudonyms = "#" * string(input_generator) * "..." * (!isempty(new_members) ? ", " * new_member_string : "")
     else
         input_pseudonyms = new_member_string
@@ -155,7 +153,7 @@ end
 
 @get "/braidchain/{index}/proposal" function(req::Request, index::Int)
 
-    proposal = Mapper.BRAID_CHAIN[].ledger[index]
+    proposal = Mapper.BRAID_CHAIN.ledger[index]
 
     return render_template("proposal_record.html") <| [
         :INDEX => index,
@@ -177,7 +175,7 @@ end
 
 @get "/braidchain/{index}" function(req::Request, index::Int)
 
-    record = Mapper.BRAID_CHAIN[].ledger[index]
+    record = Mapper.BRAID_CHAIN.ledger[index]
 
     if record isa DemeSpec
         return Response(301, Dict("Location" => "/braidchain/$index/demespec"))
@@ -207,10 +205,12 @@ end
 
     spec = Mapper.get_demespec()
 
-    input_generator = Mapper.get_generator()
-    input_members = Mapper.get_members()
+    reset = haskey(json(req), :reset)
 
-    braidwork = Model.braid(input_generator, input_members, spec.crypto, spec, Mapper.BRAIDER[]) 
+    input_generator = Mapper.get_generator(; reset)
+    input_members = Mapper.get_members(; reset)
+
+    braidwork = Model.braid(input_generator, input_members, spec.crypto, spec, Mapper.BRAIDER; reset) 
 
     Mapper.submit_chain_record!(braidwork)
 
@@ -218,13 +218,12 @@ end
 end
 
 
-
 @get "/braidchain/new-proposal" function(req::Request)
 
     return render_template("new-proposal.html") <| [
         :TODAY => Dates.format(Dates.today(), "dd/mm/yyyy"), # LOCAL TIME HERE
         :TOMORROW => Dates.format(Dates.today() + Dates.Day(1), "dd/mm/yyyy"),
-        :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger.records)
+        :CURRENT_ANCHOR => findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN.ledger.records)
     ]
 end
 
@@ -240,7 +239,7 @@ end
 
 
     if isempty(anchor)
-        anchor_index = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN[].ledger.records)
+        anchor_index = findlast(x -> x isa BraidReceipt, Mapper.BRAID_CHAIN.ledger.records)
     else
         if anchor[1] == "#"
             anchor_index = parse(Int, anchor[2:end])
@@ -250,15 +249,13 @@ end
     end
 
     # I need to retrieve a state of the braidchain
-    anchor_state = Model.state(Mapper.BRAID_CHAIN[], anchor_index)
+    anchor_state = Model.state(Mapper.BRAID_CHAIN, anchor_index)
 
     open_datetime = DateTime(join([open_date, open_time], " "), "dd/mm/yyyy HH:MM")
     close_datetime = DateTime(join([close_date, close_time], " "), "dd/mm/yyyy HH:MM")
     release_datetime = DateTime(join([release_date, release_time], " "), "dd/mm/yyyy HH:MM")
 
     parsed_ballot = Ballot(split(ballot, "\n"))
-
-    #roles = Mapper.system_roles()
 
     spec = Mapper.get_demespec()
 
@@ -272,8 +269,7 @@ end
         collector = spec.collector, # should be deprecated
         
         state = anchor_state # anchor, because the state is in the type
-    ) |> approve(Mapper.PROPOSER[])
-
+    ) |> approve(Mapper.PROPOSER)
 
     Mapper.submit_chain_record!(proposal)
 
