@@ -1,4 +1,4 @@
-using PeaceFounder.Core.Model: Transaction, DemeSpec, Membership, BraidReceipt, Proposal, generator, root, members, ChainState
+using PeaceFounder.Core.Model: Transaction, DemeSpec, Membership, BraidReceipt, Proposal, generator, root, members, roll, ChainState, termination_bitmask
 using PeaceFounder.Server.Controllers: BraidChainController
 
 
@@ -42,6 +42,14 @@ function row_view(record::Membership, i::Int)
     return RecordView(i, type, timestamp, issuer, "member")
 end
 
+function row_view(record::Termination, i::Int)
+
+    type = "Termination"
+    timestamp = Dates.format(record.seal.timestamp |> local_time, "d u yyyy, HH:MM")
+    issuer = """<td><span class="fw-normal">#1.Registrar</span></td>"""
+    
+    return RecordView(i, type, timestamp, issuer, "termination")
+end
 
 function row_view(record::BraidReceipt, i::Int) # Rename BraidWork to BraidReceipt
 
@@ -113,6 +121,17 @@ end
     ]
 end
 
+@get "/braidchain/{index}/termination" function(req::Request, index::Int)
+
+    record = Mapper.BRAID_CHAIN.ledger[index]::Termination
+    
+    return render_template("termination.html") <| [
+        :INDEX => index,
+        :REGISTRATION => record.index == 0 ? "0 (Unregistered)" : record.index,
+        :IDENTITY => chunk_string(string(record.identity), 8) |> uppercase,
+        :ISSUE_DATE => format_date_ordinal(record.seal.timestamp |> local_time)
+    ]
+end
 
 struct AliasView
     ALIAS::Int
@@ -120,13 +139,20 @@ struct AliasView
 end
 
 @get "/braidchain/{index}/braid" function(req::Request, index::Int)
-    
-    input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN.ledger.records, index - 1)
 
     braid = Mapper.BRAID_CHAIN.ledger[index]
-
     output_members = Model.output_members(braid)
-    new_members = [i for (i, r) in enumerate(Mapper.BRAID_CHAIN.ledger) if r isa Membership && i > input_generator]
+    bitmask = termination_bitmask(Mapper.BRAID_CHAIN, index)
+
+    if braid.reset
+        input_generator = 1
+        input_pseudonyms = ""
+        new_members = [i for (i, r) in enumerate(view(Mapper.BRAID_CHAIN.ledger, 1:index)) if r isa Membership && !bitmask[i]]
+    else
+        input_generator = findprev(x -> x isa BraidReceipt || x isa DemeSpec, Mapper.BRAID_CHAIN.ledger.records, index - 1)
+        new_members = [i for (i, r) in enumerate(view(Mapper.BRAID_CHAIN.ledger, 1:index)) if r isa Membership && i > input_generator && !bitmask[i]]
+    end
+
     new_member_string = join(["#$i" for i in new_members], ", ")
 
     if Mapper.BRAID_CHAIN.ledger[input_generator] isa BraidReceipt
@@ -143,9 +169,10 @@ end
         :DEMESPEC_HASH => chunk_string(string(Model.digest(braid.producer, braid.producer.crypto.hasher)), 8) |> uppercase,
         :OUTPUT_GENERATOR => chunk_string(string(Model.output_generator(braid)), 8) |> uppercase,
         :TABLE => [AliasView(i, chunk_string(string(p), 8) |> uppercase) for (i, p) in enumerate(output_members)],
+        :RESET => braid.reset ? "True" : "False",
         :MEMBER_COUNT => length(output_members),
         :INPUT_GENERATOR => input_generator,
-        :ANONIMITY_THRESHOLD_GAIN => length(new_members),
+        :ANONIMITY_THRESHOLD_GAIN => braid.reset ? length(output_members) : length(new_members),
         :ISSUE_DATE => format_date_ordinal(braid.approval.timestamp |> local_time),
         :INPUT_PSEUDONYMS => input_pseudonyms
     ]
@@ -193,9 +220,12 @@ end
 
     spec = Mapper.get_demespec()
 
+    drop_count = length(members(Mapper.BRAID_CHAIN)) - length(roll(Mapper.BRAID_CHAIN))
+
     return render_template("new-braid.html") <| [
         :TITLE => spec.title,
         :UUID => spec.uuid,
+        :DROP_COUNT => drop_count,
         :GUARDIAN => chunk_string(string(issuer(spec)), 8) |> uppercase
     ]
 end

@@ -9,8 +9,8 @@ using PeaceFounder.Server: Mapper, Service
 using PeaceFounder.Core.Model: CryptoSpec, generate, Signer, DemeSpec, id, approve, Ballot, Proposal, Selection, braid, index
 
 ENV["USER_DATA"] = joinpath(tempdir(), "peacefounderadmin")
-rm(ENV["USER_DATA"], force=true, recursive=true)
-mkdir(ENV["USER_DATA"])
+#rm(ENV["USER_DATA"], force=true, recursive=true)
+#mkdir(ENV["USER_DATA"])
 
 include("../examples/integration/setup.jl")
 
