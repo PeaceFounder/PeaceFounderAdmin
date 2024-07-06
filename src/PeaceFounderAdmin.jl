@@ -56,7 +56,8 @@ end
 
 const CORS_HEADERS = [
     "Access-Control-Allow-Origin" => "*",
-    "Access-Control-Allow-Headers" => "*, Authorization",
+    #"Access-Control-Allow-Headers" => "*, Authorization",
+    "Access-Control-Allow-Headers" => "*, Authorization, Origin, X-Requested-With, Content-Type, Accept",
     "Access-Control-Allow-Methods" => "POST, GET, PUT, OPTIONS",
     "Access-Control-Expose-Headers" => "*"
 ]

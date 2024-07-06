@@ -19,10 +19,11 @@ dynamicfiles(joinpath(@__DIR__, "static"), "/static")
 
 INVITES::Dict{String, String} = Dict() # represents a local database
 
-InviteCode.TOKEN_KEY = "2b74aabe536fa38c39fd6f0662473d25fc7bb3f76adcf7cafd8853a10045e3cb" |> hex2bytes
+InviteCode.TOKEN_KEY = "d4839d1b2601a30e2a664a833b17c0366cab4c4716a13329ad2f5d38ddef76c3" |> hex2bytes
 InviteCode.TOKEN_LENGTH = 8
 
-SERVER = URI("http://127.0.0.1:4584")
+#SERVER = URI("http://127.0.0.1:4584")
+SERVER = URI("http://0.0.0.0:4584")
 
 
 @get "/" function(req::Request)

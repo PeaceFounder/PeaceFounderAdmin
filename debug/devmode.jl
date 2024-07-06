@@ -46,7 +46,7 @@ function init_test_state()
 
         return DemeSpec(;
                         uuid = Base.UUID(rand(UInt128)),
-                        title = "A local democratic communituy",
+                        title = "A local democratic community",
                         email = "guardian@peacefounder.org",
                         crypto = crypto,
                         recorder = pbkeys[1],
@@ -71,7 +71,6 @@ function init_test_state()
     PeaceFounderAdmin.SETTINGS.SMTP_EMAIL = "demeregistrar@inbox.lv"
     PeaceFounderAdmin.SETTINGS.SMTP_SERVER = "smtps://mail.inbox.lv:465"
     PeaceFounderAdmin.SETTINGS.SMTP_PASSWORD = ENV["REGISTRAR_PASSWORD"] 
-
 
     # For debugging the Electoral Roll view
     # create_profile("Peter Parker", "DEBUG").state = Invited(false)
@@ -117,8 +116,14 @@ function init_test_state()
 
     proposal = Proposal(
         uuid = Base.UUID("49e9ebce-fb9e-5b83-1534-75cff3ee423a"),
-        summary = "Should the city ban all personal vehicle usage and invest in alternative forms of transportation such as public transit, biking and walking infrastructure?",
-        description = "",
+        summary = "Should the city prioritize public transit and active transport over personal vehicles?",
+        description = """
+This proposal aims to revolutionize our city's transportation system by completely banning personal vehicle usage within city limits and redirecting resources towards alternative forms of transportation. The ban would apply to all privately owned cars, motorcycles, and other motorized personal vehicles, with exceptions only for emergency services, public utilities, and certain approved commercial uses.
+
+In place of personal vehicles, the city would make significant investments in expanding and improving public transit systems, including buses, light rail, and subway networks. Additionally, extensive funding would be allocated to develop comprehensive biking and walking infrastructure, such as protected bike lanes, pedestrian-friendly streets, and car-free zones. These changes aim to reduce traffic congestion, decrease air pollution, improve public health through increased physical activity, and create a more livable urban environment.
+
+Supporters argue that this radical shift would lead to a cleaner, safer, and more efficient city, while critics raise concerns about individual freedom, accessibility for those with mobility issues, and potential economic impacts on businesses and workers who rely on personal vehicles. Voters are asked to consider the long-term environmental and social benefits against the short-term challenges and lifestyle changes this proposal would entail.
+        """,
         ballot = Ballot(["Yes", "No"]),
         open = Dates.now(UTC),
         closed = Dates.now(UTC) + Dates.Second(600),
@@ -159,7 +164,7 @@ end
 
 
 
-PeaceFounderAdmin.serve(server_middleware=[ReviseHandler], admin_middleware=[ReviseHandler]) do
+PeaceFounderAdmin.serve(server_middleware=[ReviseHandler], admin_middleware=[ReviseHandler], server_host="0.0.0.0") do
 
     if isempty(readdir(ENV["USER_DATA"]))
         init_test_state()

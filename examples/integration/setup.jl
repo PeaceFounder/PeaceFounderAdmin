@@ -12,12 +12,12 @@ import PeaceFounder.Core.Model: TicketID
 import PeaceFounder.Server.Mapper
 
 import PeaceFounder.Authorization: AuthServerMiddleware, timestamp
-using Dates: DateTime, now, Second
+using Dates: DateTime, now, Second, UTC
 
 
 @post "/registrar" function(req::Request)
     
-    if abs(now() - timestamp(req)) > Second(5) 
+    if abs(now(UTC) - timestamp(req)) > Second(5) 
         return Response(400, "Request arrived too late")
     end
 
