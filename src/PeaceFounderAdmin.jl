@@ -77,8 +77,11 @@ function CorsMiddleware(handler)
 end
 
 
-function serve(mock::Function = () -> nothing; server_port=4584, server_host="127.0.0.1", server_route=nothing, admin_port=3221, admin_middleware=[], server_middleware=[])
+function serve(mock::Function = () -> nothing; server_port=4584, server_host="127.0.0.1", server_route=nothing, admin_host="127.0.0.1", admin_port=3221, admin_middleware=[], server_middleware=[])
 
+    if admin_host!=="127.0.0.1"
+        @warn "The admin host should only be accessed through secure, encrypted channels like an SSH tunnel or VPN. Your current server configuration leaves it exposed to potential sabotage. Ignore if used for demonstrative purposes."
+    end
     # This is the stage where the server may read out user ssettings to read out files
 
     if haskey(ENV, "USER_DATA") && !isempty(ENV["USER_DATA"])
@@ -129,7 +132,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
     end
 
     server_service = PeaceFounder.Server.Service.serve(async=true, port=server_port, host=server_host, middleware=[server_middleware..., CorsMiddleware])
-    admin_service = AdminService.serve(port=admin_port, middleware=[admin_middleware..., SetupMiddleware], async=true)
+    admin_service = AdminService.serve(port=admin_port, host=admin_host, middleware=[admin_middleware..., SetupMiddleware], async=true)
     
     try 
         
