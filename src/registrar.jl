@@ -73,8 +73,6 @@ function get_termination_index(null::Function, chain, identity::Pseudonym)
     return null()
 end
 
-using Infiltrator
-
 function must_throw(null::Function)
     return function ()
         null()
@@ -253,8 +251,6 @@ function evict_electoral_roll_entry(ticketid)
 
     return
 end
-
-using Infiltrator
 
 function evict(ticketid::TicketID)
 

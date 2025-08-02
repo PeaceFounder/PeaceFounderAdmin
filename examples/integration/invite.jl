@@ -33,6 +33,9 @@ function invite_str(resp::Response, ticketid::Vector{UInt8}; attempt = UInt8(0))
     (; demehash, hasher, route) = JSON3.read(resp.body)
 
     demehash_bytes = hex2bytes(demehash)
+
+    # tokens can be reset at setup.jl by increasing attempt counter. Currently in all places
+    # it is fixed to 0. 
     _token = Nettle.digest(hasher, UInt8[TOKEN_KEY..., attempt, ticketid...])[1:TOKEN_LENGTH]    
 
     return invite_str(hasher, demehash_bytes, URI(route), _token)

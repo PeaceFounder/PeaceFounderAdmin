@@ -333,3 +333,14 @@ body {
 		padding:  0;
 	}
 }
+
+
+.form-v4-content .form-detail .demo-notice {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-bottom: 0;
+  padding-bottom: 20px;
+}

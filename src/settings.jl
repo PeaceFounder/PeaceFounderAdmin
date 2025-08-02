@@ -114,7 +114,8 @@ end
 
 @get "/settings" function(req::Request)
 
-    SETTINGS.SSH_PUBLIC_KEY = get_ssh_pubkey()
+    #SETTINGS.SSH_PUBLIC_KEY = get_ssh_pubkey()
+    SETTINGS.SSH_PUBLIC_KEY = ""
 
     return render(joinpath(TEMPLATES, "settings.html"), SETTINGS) |> html
 end

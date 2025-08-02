@@ -1,3 +1,5 @@
+# This demo illustrates the ease of integration, as this registration form operates completely independently with HTTP requests secured via HMAC authorization using a shared secret and simple token derivation: token = SHA256(key|attempt|ticketid), where the ticketid is registered by the endpoint.
+
 using Oxygen
 using Mustache
 using HTTP
@@ -8,23 +10,36 @@ request(url::URI, req::Request) = HTTP.request(req.method, URI(url; path = req.t
 
 include("invite.jl")
 
-TITLE::String = "Local Democratic Community"
+TITLE::String = "Demo: PeaceFounder E-Voting System"
 PITCH::String = """
-    <p> Are you looking for a way to get involved in local politics and make a difference in your community? Do you want to connect with like-minded individuals who share your values and beliefs? If so, we invite you to join our Local Democratic Community.</p>
+  <p>Welcome to this PeaceFounder demonstration! This demo instance features simplified registration to showcase how any organization, community group, or workplace (deme) can deploy end-to-end verifiable remote voting using PeaceFounder.</p>
 
-<p> Our community is a group of individuals who are passionate about promoting progressive values and creating positive change in our neighborhoods and towns. We believe that by working together, we can build a more just and equitable society for everyone. As a member of our community, you will have the opportunity to attend events, participate in volunteer activities, and engage in meaningful discussions about the issues that matter most to you.</p>
+<p>This demonstration illustrates a complete e-voting system where members of any deme can participate in democratic decision-making. Administrators manage the deme through the PeaceFounder admin panel at http://127.0.0.1:3221, where they can add and revoke memberships, braid members, and issue proposals for voting. Note that only proposals submitted after your registration will be available for voting - this design enables anonymization before the voting phase begins, eliminating complex tallying ceremonies at the end.</p>
 """
 
 dynamicfiles(joinpath(@__DIR__, "static"), "/static")
 
 INVITES::Dict{String, String} = Dict() # represents a local database
 
-InviteCode.TOKEN_KEY = "d4839d1b2601a30e2a664a833b17c0366cab4c4716a13329ad2f5d38ddef76c3" |> hex2bytes
+if haskey(ENV, "REGISTRAR_TOKEN")
+    @info "Using environemnt registrar token key"
+    token_hex = ENV["REGISTRAR_TOKEN"]
+elseif  isfile("/run/secrets/registrar_token") # consider adding && isfile("/run/.containerenv")
+    @info "Loading registrar token from /run/secrets/registrar_token"
+    token_hex = read("/run/secrets/registrar_token", String) |> strip 
+end
+
+# TODO: I have an issue with:
+# Why did I adde another hash and simply did not use hmac?
+# function token_key(hmac::HMAC) 
+#     hash = hasher(hmac)
+#     return hash(UInt8[0, key(hmac)...])
+# end    
+
+InviteCode.TOKEN_KEY = token_hex |> hex2bytes # The issue is with 
 InviteCode.TOKEN_LENGTH = 8
 
-#SERVER = URI("http://127.0.0.1:4584")
-SERVER = URI("http://0.0.0.0:4584")
-
+SERVER = URI(get(ENV, "PEACEFOUNDER_SERVICE", "http://0.0.0.0:4584"))
 
 @get "/" function(req::Request)
     template = Mustache.load(joinpath(@__DIR__, "assets", "index.html"))
@@ -90,4 +105,4 @@ end
 end
 
 
-Oxygen.serve(port=3456)
+Oxygen.serve(host="0.0.0.0", port=3456)

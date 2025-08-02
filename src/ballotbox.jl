@@ -73,8 +73,6 @@ function format_percent(fraction)
     end
 end
 
-using Infiltrator
-
 @get "/braidchain/{index}/tally" function(req::Request, index::Int)
 
     proposal = Mapper.BRAID_CHAIN.ledger[index]

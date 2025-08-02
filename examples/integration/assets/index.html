@@ -29,14 +29,19 @@
           <div class="form-row">
 	    <label for="name">Name</label>
 	    <input type="text" name="name" placeholder="Enter Name" id="name" class="input-text" required>
+
 	  </div>
 
-	  <div class="form-row">
+	  <div class="form-row" style="display: none;">
 	    <label for="your_email">Email</label>
 	    <input type="text" name="email" placeholder="Enter Email" id="your_email" class="input-text" required pattern="[^@]+@[^@]+.[a-zA-Z]{2,6}">
 	  </div>
 
-	  <div class="form-row-last">
+
+          <div class="form-row-last" style="padding-top:0;">
+            <p class="demo-notice">
+              Email will not be required for this demo
+            </p>
 	    <a class="register" onclick="submitForm('registrationForm');">Register</a>
 	  </div>
 	</form>

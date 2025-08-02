@@ -98,8 +98,6 @@ function reset_git_repo()
     return
 end
 
-using Infiltrator
-
 function git_push(; commit = "server event", presync = false)
 
     if isempty(SETTINGS.PATH) 

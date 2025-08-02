@@ -64,6 +64,16 @@ end
 
     Mapper.set_route(SETTINGS.SERVER_ROUTE)
 
+    # TODO: for now we are not considering token invalidation and regeneration
+    # TODO: add token length parameter and make registrar_token a json
+    if haskey(ENV, "USER_DATA")
+
+        mkdir(joinpath(ENV["USER_DATA"], "shared"))
+        registrar_token_path = joinpath(ENV["USER_DATA"], "shared", "registrar_token")
+        write(registrar_token_path, Mapper.token_key() |> bytes2hex)
+
+    end
+
     return
 end
 

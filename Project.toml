@@ -1,13 +1,12 @@
 name = "PeaceFounderAdmin"
 uuid = "71cbcc19-d5de-42ce-8f1e-a2372a8e1f1c"
 authors = ["Janis Erdmanis <janiserdmanis@protonmail.ch>"]
-version = "0.0.1"
+version = "0.0.2"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Git = "d7ba0133-e1db-5d97-8f8c-041e4b3a1eb2"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-Infiltrator = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
 OpenSSH_jll = "9bd350c2-7e96-507f-8002-3f2e150b4e1b"
@@ -20,6 +19,9 @@ StructTypes = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
+[compat]
+Oxygen = "1.5.6"
 
 [bundle]
 APP_DESCRITPION = "Discover PeaceFounder voting system: publically verifiable software independent, privacy uncompromising, user-friendly server solution with an advanced admin panel for effortless voting management. Ideal for organisations with limited deployment resources who want hard and ever-lasting evidence on integrity and a secure and accountable voting process."

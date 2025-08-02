@@ -206,7 +206,7 @@ end
 
     if record isa DemeSpec
         return Response(301, Dict("Location" => "/braidchain/$index/demespec"))
-    elseif record isa Member
+    elseif record isa Membership
         return Response(301, Dict("Location" => "/braidchain/$index/member"))
     elseif record isa Proposal
         return Response(301, Dict("Location" => "/braidchain/$index/proposal"))

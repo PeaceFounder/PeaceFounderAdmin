@@ -1,7 +1,6 @@
 module PeaceFounderAdmin
 
 using Mustache
-using Infiltrator
 using PeaceFounder
 using UUIDs
 
@@ -77,10 +76,10 @@ function CorsMiddleware(handler)
 end
 
 
-function serve(mock::Function = () -> nothing; server_port=4584, server_host="127.0.0.1", server_route=nothing, admin_host="127.0.0.1", admin_port=3221, admin_middleware=[], server_middleware=[])
+function serve(mock::Function = () -> nothing; server_port=4584, server_host="127.0.0.1", server_route=nothing, admin_host=get(ENV, "PEACEFOUNDER_ADMIN_HOST", "127.0.0.1"), admin_port=3221, admin_middleware=[], server_middleware=[])
 
     if admin_host!=="127.0.0.1"
-        @warn "The admin host should only be accessed through secure, encrypted channels like an SSH tunnel or VPN. Your current server configuration leaves it exposed to potential sabotage. Ignore if used for demonstrative purposes."
+        @warn "The admin host should only be accessed through secure, encrypted channels like an SSH tunnel or VPN. Your current server configuration leaves it exposed to potential sabotage. Ignore if used for demonstrative purposes or used through podman." 
     end
     # This is the stage where the server may read out user ssettings to read out files
 
@@ -92,7 +91,7 @@ function serve(mock::Function = () -> nothing; server_port=4584, server_host="12
                 
         @info """User data set to $(ENV["USER_DATA"])"""
 
-        if isempty(readdir(ENV["USER_DATA"]))
+        if isempty(filter(!=("config"), readdir(ENV["USER_DATA"])))
             @info "Starting fresh with setup"
         else
             try 
