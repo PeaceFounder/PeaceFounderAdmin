@@ -62,7 +62,7 @@ Each record in the BraidChain ledger is authenticated by an issuer's digital sig
 
 ## References
 
-- Janis Erdmanis. *PeaceFounder: *PeaceFounder: centralised E2E verifiable evoting via pseudonym braiding and history trees.* 2024
+- Janis Erdmanis. *PeaceFounder: centralised E2E verifiable evoting via pseudonym braiding and history trees.* 2024
 - Rolf Haenni and Oliver Spycher. *Secure internet voting on limited devices with anonymized DSA public keys.* 2011
 - Scott A. Crosby and Dan S. Wallach. *Efficient data structures for tamper-evident logging.* 2009
 - Douglas Wikström. *A Commitment-Consistent Proof of a Shuffle.* 2009
