@@ -11,29 +11,24 @@ RUN julia --project=. -e "using Pkg; Pkg.instantiate()"
 # Copy application code
 COPY . ./
 
-# Auto-detect architecture and set CPU target
-# Set CPU target and precompile within Julia
-RUN julia --project=. <<'EOF'
-arch = Sys.ARCH
-
-cpu_target = if arch == :x86_64
-    "generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
-elseif arch == :aarch64
-    "generic;apple-m1"
-else
-    "generic"
-end
-
-println("Detected Julia architecture: $arch")
-println("Using JULIA_CPU_TARGET: $cpu_target")
-
-using Pkg
-withenv("JULIA_CPU_TARGET" => cpu_target) do
-    Pkg.precompile()
-end
-
-println("Precompilation completed with optimized target!")
-EOF
+# Auto-detect architecture and set CPU target, then precompile
+RUN julia --project=. -e ' \
+    arch = Sys.ARCH; \
+    cpu_target = if arch == :x86_64; \
+        "generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"; \
+    elseif arch == :aarch64; \
+        "generic;apple-m1"; \
+    else; \
+        "generic"; \
+    end; \
+    println("Detected Julia architecture: $arch"); \
+    println("Using JULIA_CPU_TARGET: $cpu_target"); \
+    using Pkg; \
+    withenv("JULIA_CPU_TARGET" => cpu_target) do; \
+        Pkg.precompile(); \
+    end; \
+    println("Precompilation completed with optimized target!"); \
+'
 
 # Use /home/peacefounder for data
 ENV USER_DATA=/home/peacefounder
@@ -46,4 +41,4 @@ RUN mkdir -p /home/peacefounder
 EXPOSE 3221 4584
 
 ENTRYPOINT ["julia", "--project=.", "main.jl"]
-CMD []
+CMD [] # Containerfile for PeaceFounder service
