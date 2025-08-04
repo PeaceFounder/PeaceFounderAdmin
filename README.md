@@ -8,8 +8,7 @@ The first step to begin using the PeaceFounder e-voting system is to host it usi
 ```
 podman run -d --name peacefounder \
   -p 127.0.0.1:3221:3221 -p 4584:4584 \
-  --secret registrar_token \
-  ghcr.io/peacefounder/peacefounderadmin:latest --load=./examples/integration/setup.jl
+  ghcr.io/peacefounder/peacefounderadmin:latest
 ```
 
 The admin panel is hosted on the localhost `127.0.0.1:3221`, where you shall run a short three-step wizard to configure the system. By default, to use the system, you will need to have a working SMTP to send invite links to your members. Alternatively, integration with existing infrastructure can be done, see `examples/demo.sh`. 
