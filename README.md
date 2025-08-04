@@ -3,33 +3,30 @@
 
 ![](docs/assets/peacefounder-setup.webp)
 
-The first step to begin using the PeaceFounder e-voting system is to host it, which is a straightforward process on Linux servers. Begin by downloading the snap package with the command below, and remember to change the architecture to `arm64` if necessary:
+The first step to begin using the PeaceFounder e-voting system is to host it using Podman. Start the container with the following command:
 
 ```
-curl -LOJ https://github.com/PeaceFounder/PeaceFounderAdmin/releases/download/v0.0.1/peacefounder-server-0.0.1-x64.snap
+podman run -d --name peacefounder \
+  -p 127.0.0.1:3221:3221 -p 4584:4584 \
+  --secret registrar_token \
+  ghcr.io/peacefounder/peacefounderadmin:latest --load=./examples/integration/setup.jl
 ```
 
-Next, proceed to install the package:
+The admin panel is hosted on the localhost `127.0.0.1:3221`, where you shall run a short three-step wizard to configure the system. By default, to use the system, you will need to have a working SMTP to send invite links to your members. Alternatively, integration with existing infrastructure can be done, see `examples/demo.sh`. 
+
+The admin panel is not directly accessible from external networks. To access the admin panel remotely, use SSH to forward the local host port:
 
 ```
-snap install --devmode peacefounder-server-0.0.1-x64.snap
+ssh -L 3221:127.0.0.1:3221 pi5@192.168.1.126
 ```
 
-This installation process automatically handles the compilation and configures the system to start automatically with systemd.
+This approach handles secure authentication to the server and is free from PKI network trust assumptions.
 
-The admin panel, accessible at `http://127.0.0.1:3221`, is hosted locally and is not directly accessible from external networks. To access the admin panel remotely, use SSH to forward the local host port:
-
-```
-ssh -L 2332:127.0.0.1:3221 user@192.168.1.16
-```
-
-This trick does a secure authentification to the server and is free from PKI network trust assumptions.
-
-The admin panel start with a setup wizard, guiding you to select a cryptographic group, choose a hash function, and generate keys. The server generates the guardian key, which is then encrypted with the provided password and stored in the deme record (a feature currently not implemented). Alternatively, you can use the advanced configurator. This option allows for local creation and signing of the deme record, with the option to encrypt the guardian key on the record (also yet to be implemented). The configurator also facilitates server migration, allowing you to input an existing tarball of braidchain records. The deme record is then appended as the last record, enabling continuity (this feature is also pending implementation).
+The admin panel starts with a setup wizard, guiding you to select a cryptographic group, choose a hash function, and generate keys. The server generates the guardian key, which is then encrypted with the provided password and stored in the deme record (a feature currently not implemented). Alternatively, you can use the advanced configurator. This option allows for local creation and signing of the deme record, with the option to encrypt the guardian key on the record (also yet to be implemented). The configurator also facilitates server migration, allowing you to input an existing tarball of braidchain records. The deme record is then appended as the last record, enabling continuity (this feature is also pending implementation).
 
 Once the wizard is complete, the PeaceFounder server becomes active at `http://0.0.0.0:4585`. This is the public access point for clients and exposes the REST API. Further configurations, such as setting up an SMTP server to send invitations to prospective members, are done in the *Settings* panel. Here, you also need to specify an address through which clients can connect to the server. This could be a local address, a public IP, or a DNS pointing to the PeaceFounder REST API.
 
-It's important to note that configuring the system doesn't require a TLS certificate for security, as all replies are signed with braidchain and ballotbox tree root commits. Using TLS can be detrimental as it might lower the threshold for making the system vulnerable to DDOS attacks since TLS session resumption has to be disabled to maintain voter anonymity. Each session would require a new key exchange, relying on a relatively costly group operation. Nevertheless, adding TLS currently wouldn't incur additional costs, as HTTP request processing performance is currently not optimised. Furthermore, the PeaceFounder client functions smoothly, even when the server is configured behind NGINX.
+It is recommended to use a DNS for discovery, as this will enable seamless host server address upgrades. No TLS configuration is necessary, as the service verifies the authenticity of the replies by placing signatures on them, and voters put pseudonym signatures on their votes. Post-quantum TLS is necessary for everlasting privacy when a voting calculator is used to prevent record now and decrypt later attacks. Using TLS can be detrimental as it might lower the threshold for making the system vulnerable to DDOS attacks since TLS session resumption has to be disabled to maintain voter anonymity. Each session would require a new key exchange, relying on a relatively costly group operation. Nevertheless, adding TLS currently wouldn't incur additional costs, as HTTP request processing performance is currently not optimised. Furthermore, the PeaceFounder client functions smoothly, even when the server is configured behind NGINX.
 
 ## Member Registration
 
@@ -52,9 +49,9 @@ To guarantee the auditability of the electoral roll, the process involves member
 
 The registration of members is followed by the generation of a braid. To boost anonymity, several braids can chained together in sequence. This technique raises the anonymity threshold - the least number of entities required to be breached to associate a member's certificate with their voting pseudonym. Currently, the system supports only self-braiding, setting the maximum anonymity threshold at one. Future updates aim to enable braiding between different demes, which could be either fictional entities created for specific votes or real communities worldwide. The integrity of the final braid receipt is verified using Zero-Knowledge Proofs (ZKPs) and recorded in the braidchain.
 
-To initiate voting, the guardian sets up a new proposal. This proposal includes key details such as opening and closing times, title, description, ballot, and an anchor. The anchor is essentially the index of a braid, whose generator and pseudonyms are utilized for the vote. Members registered after the braid’s creation are not included in that particular vote. However, continuous member registration and the ability to self-braid should minimize such exclusions. The anchor also facilitates linking multiple proposals, allowing fluid voting situations where members can alter their votes at predetermined times during a representative’s term.
+To initiate voting, the guardian sets up a new proposal. This proposal includes key details such as opening and closing times, title, description, ballot, and an anchor. The anchor is essentially the index of a braid, whose generator and pseudonyms are utilized for the vote. Members registered after the braid's creation are not included in that particular vote. However, continuous member registration and the ability to self-braid should minimize such exclusions. The anchor also facilitates linking multiple proposals, allowing fluid voting situations where members can alter their votes at predetermined times during a representative's term.
 
-As voting progresses, each vote is logged in the ballot box ledger, displaying the vote cast index, timestamp, sequence number, and vote status. Voters receive a receipt including the timestamp and cast index as a tracking number, which enables them to locate their vote on the bulletin board. The pseudonym links all votes cast from a single device. Plans are underway to introduce an additional token for verifying the vote’s authenticity and a public bulletin board hosted as a static webpage. This will allow voters to ensure their vote is cast as intended and counted accurately.
+As voting progresses, each vote is logged in the ballot box ledger, displaying the vote cast index, timestamp, sequence number, and vote status. Voters receive a receipt including the timestamp and cast index as a tracking number, which enables them to locate their vote on the bulletin board. The pseudonym links all votes cast from a single device. Plans are underway to introduce an additional token for verifying the vote's authenticity and a public bulletin board hosted as a static webpage. This will allow voters to ensure their vote is cast as intended and counted accurately.
 
 ## BraidChain Ledger
 
@@ -63,3 +60,10 @@ As voting progresses, each vote is logged in the ballot box ledger, displaying t
 The BraidChain and BallotBox ledgers together create publicly available proof of election integrity. The BallotBox ledger is straightforward, containing votes signed with the voter's pseudonym without altering the state of the ballot box. In contrast, the BraidChain ledger is more complex, and every record changes the system state. Auditors can run audit commands on records stored in the disk (in development) that require no deep understanding of the underlying data structure. However, in cases where issues arise, having a reference point to communicate about these issues effectively is beneficial.
 
 Each record in the BraidChain ledger is authenticated by an issuer's digital signature. To be included, the issuer's record must possess the necessary authorisation, with corresponding public keys detailed in the DemeSpec record, particularly in the roster section. Should there be a need to change a party's key, a revised DemeSpec record is issued, authenticated with the Guardian's private key. It's crucial to secure this key diligently to prevent adversaries from assuming authority and hijacking the election process, which could disrupt availability and create an inconsistent state for participants, leading to the generation of *blame proofs*. In events where the Guardian's key is compromised, it would necessitate the re-establishment of the deme from scratch. Looking ahead, a potential improvement could involve requiring multiple parties to sign off on the DemeSpec record for it to be valid, thus reducing the likelihood of such breaches.
+
+## References
+
+- Janis Erdmanis. *PeaceFounder: *PeaceFounder: centralised E2E verifiable evoting via pseudonym braiding and history trees.* 2024
+- Rolf Haenni and Oliver Spycher. *Secure internet voting on limited devices with anonymized DSA public keys.* 2011
+- Scott A. Crosby and Dan S. Wallach. *Efficient data structures for tamper-evident logging.* 2009
+- Douglas Wikström. *A Commitment-Consistent Proof of a Shuffle.* 2009
