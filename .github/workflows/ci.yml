@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+    paths-ignore:
+      - "docs/**"
+
+# only run the latest commit to avoid cache overwrites
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  amd64_build:
+    runs-on: ubuntu-22.04
+    name: AMD64 Build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Create short sha
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Lowercase repository name
+        id: repo
+        run: echo "name=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Set up Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Log in to Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+      - name: Build AMD64 image
+        run: |
+          podman build \
+            --file ./Containerfile \
+            --tag ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-amd64 \
+            .
+
+      - name: Push AMD64 image
+        run: |
+          podman push ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-amd64
+
+  arm64_build:
+    runs-on: ubuntu-22.04-arm64
+    name: ARM64 Build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Create short sha
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Lowercase repository name
+        id: repo
+        run: echo "name=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Set up Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Log in to Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+      - name: Build ARM64 image
+        run: |
+          podman build \
+            --file ./Containerfile \
+            --tag ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-arm64 \
+            .
+
+      - name: Push ARM64 image
+        run: |
+          podman push ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-arm64
+
+  assemble_manifest:
+    runs-on: ubuntu-22.04
+    name: Assemble multi-arch manifest
+    needs:
+      - amd64_build
+      - arm64_build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Create short sha
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Lowercase repository name
+        id: repo
+        run: echo "name=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Set up Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Log in to Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+      - name: Create and push multi-arch manifest
+        run: |
+          # Create manifest with short SHA
+          podman manifest create ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}
+          podman manifest add ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }} \
+            ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-amd64
+          podman manifest add ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }} \
+            ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-arm64
+          podman manifest push ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}
+
+          # Create manifest with latest tag
+          podman manifest create ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:latest
+          podman manifest add ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:latest \
+            ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-amd64
+          podman manifest add ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:latest \
+            ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-arm64
+          podman manifest push ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:latest
