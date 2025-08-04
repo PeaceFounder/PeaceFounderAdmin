@@ -11,10 +11,6 @@ RUN julia --project=. -e "using Pkg; Pkg.instantiate()"
 # Copy application code
 COPY . ./
 
-# Precompile for faster startup
-# ENV JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
-
-
 # Auto-detect architecture and set CPU target
 # Set CPU target and precompile within Julia
 RUN julia --project=. <<'EOF'
