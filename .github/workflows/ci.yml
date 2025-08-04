@@ -58,7 +58,7 @@ jobs:
           podman push ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ env.SHORT_SHA }}-amd64
 
   arm64_build:
-    runs-on: ubuntu-24.04-arm64
+    runs-on: ubuntu-24.04-arm
     name: ARM64 Build
     permissions:
       contents: read
